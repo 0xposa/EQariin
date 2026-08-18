@@ -1,0 +1,36 @@
+{
+  "surah_number": 1,
+  "surah_name": "Al-Fatihah",
+  "revelation_place": "Makkiyyah",
+  "verse_count": 7,
+  "verses": [
+    {
+      "verse_number": 1,
+      "text": "Rahmân ve Rahîm olan Allah'ın adıyla."
+    },
+    {
+      "verse_number": 2,
+      "text": "Hamd, âlemlerin Rabbi olan Allah'a mahsustur."
+    },
+    {
+      "verse_number": 3,
+      "text": "O, Rahmân'dır, Rahîm'dir."
+    },
+    {
+      "verse_number": 4,
+      "text": "Din gününün sahibidir."
+    },
+    {
+      "verse_number": 5,
+      "text": "Ancak sana kulluk eder ve ancak senden yardım dileriz."
+    },
+    {
+      "verse_number": 6,
+      "text": "Bizi dosdoğru yola ilet,"
+    },
+    {
+      "verse_number": 7,
+      "text": "Kendilerine nimet verdiğin kimselerin yoluna; gazaba uğramışların ve sapmışların yoluna değil."
+    }
+  ]
+}

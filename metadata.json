@@ -1,0 +1,8 @@
+{
+  "name": "E Qariin",
+  "description": "E Qariin - Al-Quran multilingual data viewer and manager.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

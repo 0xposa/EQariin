@@ -1,0 +1,36 @@
+{
+  "surah_number": 1,
+  "surah_name": "Al-Fatihah",
+  "revelation_place": "Makkiyyah",
+  "verse_count": 7,
+  "verses": [
+    {
+      "verse_number": 1,
+      "text": "En el nombre de Dios, el Compasivo, el Misericordioso."
+    },
+    {
+      "verse_number": 2,
+      "text": "Todas las alabanzas son para Dios, Señor del universo,"
+    },
+    {
+      "verse_number": 3,
+      "text": "El Compasivo, el Misericordioso,"
+    },
+    {
+      "verse_number": 4,
+      "text": "Soberano del Día del Juicio Final."
+    },
+    {
+      "verse_number": 5,
+      "text": "Solo a Ti te adoramos y solo a Ti te pedimos ayuda."
+    },
+    {
+      "verse_number": 6,
+      "text": "Guíanos por el camino recto,"
+    },
+    {
+      "verse_number": 7,
+      "text": "El camino de quienes has agraciado, no el de los que han incurrido en Tu ira ni el de los extraviados."
+    }
+  ]
+}

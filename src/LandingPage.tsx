@@ -1,0 +1,451 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Globe, Github, Database, BookOpen, Heart, Code2, ArrowRight, ChevronDown, Check, ExternalLink } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { AppLanguage, APP_LANGUAGES, UI_LABELS } from './constants/uiLabels';
+import { LANDING_TRANSLATIONS } from './constants/landingTranslations';
+
+const TRANSLATIONS = [
+  { lang: "Bahasa Indonesia", text: "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang." },
+  { lang: "English", text: "In the name of Allah, the Entirely Merciful, the Especially Merciful." },
+  { lang: "Mandarin", text: "奉至仁至慈的真主之名" },
+  { lang: "Japanese", text: "慈悲あまねく慈愛深きアッラーの御名において。" }
+];
+
+const LANGUAGES = [
+  "Arabic", "Bahasa Indonesia", "English", "Mandarin", 
+  "Spanish", "Japanese", "Turkish", "French", "Malay"
+];
+
+export default function LandingPage() {
+  const navigate = useNavigate();
+  const [currentTransIdx, setCurrentTransIdx] = useState(0);
+  const [appLanguage, setAppLanguage] = useState<AppLanguage>('English');
+  const [isAppLangOpen, setIsAppLangOpen] = useState(false);
+  const appLangRef = useRef<HTMLDivElement>(null);
+
+  const t = LANDING_TRANSLATIONS[appLanguage] || LANDING_TRANSLATIONS['English'];
+  const labels = UI_LABELS[appLanguage] || UI_LABELS['English'];
+  
+  const shouldReduceMotion = useReducedMotion();
+
+  const containerVariants = {
+    hidden: { opacity: shouldReduceMotion ? 1 : 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { 
+      opacity: shouldReduceMotion ? 1 : 0, 
+      y: shouldReduceMotion ? 0 : 25 
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { 
+        duration: 0.8, 
+        ease: [0.22, 1, 0.36, 1] 
+      },
+    },
+  };
+
+  const FEATURES = [
+    {
+      icon: Globe,
+      title: t.feat1Title,
+      desc: t.feat1Desc
+    },
+    {
+      icon: BookOpen,
+      title: t.feat2Title,
+      desc: t.feat2Desc
+    },
+    {
+      icon: Database,
+      title: t.feat3Title,
+      desc: t.feat3Desc
+    },
+    {
+      icon: Code2,
+      title: t.feat4Title,
+      desc: t.feat4Desc
+    }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTransIdx((prev) => (prev + 1) % TRANSLATIONS.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (appLangRef.current && !appLangRef.current.contains(event.target as Node)) {
+        setIsAppLangOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#FDFBF7] text-stone-800 font-sans selection:bg-emerald-900 selection:text-emerald-50">
+      
+      {/* Navbar */}
+      <nav className="w-full bg-emerald-950 text-emerald-50 relative z-20 shadow-md">
+        <div className="w-full max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+          <div className="font-['Playfair_Display'] text-2xl font-bold tracking-tight">
+            E Qariin<span className="text-emerald-400">.</span>
+          </div>
+          <div className="flex items-center gap-6">
+            {/* Language Dropdown */}
+            <div className="relative" ref={appLangRef}>
+              <button
+                onClick={() => setIsAppLangOpen(!isAppLangOpen)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/10 hover:bg-white/20 text-emerald-50 font-medium text-xs rounded-full backdrop-blur-md transition-all cursor-pointer"
+              >
+                <Globe className="w-3.5 h-3.5 text-emerald-100 shrink-0" />
+                <span className="font-semibold tracking-wide">{appLanguage}</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-emerald-200/70 shrink-0 transition-transform duration-200 ${isAppLangOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+            <AnimatePresence>
+              {isAppLangOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 mt-2 w-48 bg-emerald-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-emerald-800/50 py-1.5 z-50 max-h-72 overflow-y-auto"
+                >
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400/80 border-b border-emerald-800/50 mb-1">
+                    {t.selectLanguage}
+                  </div>
+                  {APP_LANGUAGES.map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => {
+                        setAppLanguage(lang);
+                        setIsAppLangOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-xs flex items-center justify-between hover:bg-emerald-800/50 transition-colors cursor-pointer ${
+                        appLanguage === lang ? 'font-semibold text-emerald-50 bg-emerald-800/80' : 'text-emerald-200/90'
+                      }`}
+                    >
+                      <span>{lang}</span>
+                      {appLanguage === lang && <Check className="w-4 h-4 text-emerald-400" />}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <motion.section 
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.2 }}
+        className="relative w-full max-w-7xl mx-auto px-6 pt-12 pb-24 md:pt-20 md:pb-32 flex flex-col items-center text-center"
+      >
+        {/* Background Decorative Blur */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-2xl h-64 bg-emerald-100/50 blur-[100px] rounded-full pointer-events-none -z-10" />
+
+        <motion.h1 
+          variants={itemVariants}
+          className="font-['Playfair_Display'] text-5xl md:text-7xl font-bold text-emerald-950 tracking-tight mb-6"
+        >
+          E Qariin
+        </motion.h1>
+        
+        <motion.p 
+          variants={itemVariants}
+          className="text-lg md:text-xl text-stone-600 max-w-2xl mb-16 leading-relaxed"
+        >
+          {t.heroDesc}
+        </motion.p>
+
+        {/* Quran Verse Display */}
+        <motion.div 
+          variants={itemVariants}
+          className="w-full max-w-3xl bg-white border border-stone-200/60 shadow-xl shadow-stone-200/40 rounded-3xl p-8 md:p-12 mb-12 relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-700 via-emerald-600 to-amber-500" />
+          
+          <div className="text-center font-['Amiri'] text-4xl md:text-6xl text-emerald-950 mb-8 leading-[1.8] md:leading-[1.8]" dir="rtl">
+            بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
+          </div>
+          
+          <div className="h-20 flex flex-col justify-center items-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentTransIdx}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4 }}
+                className="text-center"
+              >
+                <p className="text-stone-700 text-lg md:text-xl mb-2 font-medium">
+                  {TRANSLATIONS[currentTransIdx].text}
+                </p>
+                <p className="text-xs tracking-wider text-amber-700 font-semibold uppercase">
+                  {TRANSLATIONS[currentTransIdx].lang}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </motion.div>
+
+        {/* CTA Buttons */}
+        <motion.div 
+          variants={itemVariants}
+          className="flex flex-col gap-4 w-full max-w-xs sm:max-w-lg mx-auto items-center"
+        >
+          {/* Top Row: Main Actions */}
+          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+            <button 
+              onClick={() => navigate('/app')}
+              className="flex-1 sm:max-w-[160px] flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-emerald-50 px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-lg shadow-emerald-900/20 whitespace-nowrap"
+            >
+              {t.tryApp}
+              <ArrowRight className="w-4 h-4 shrink-0" />
+            </button>
+            <button 
+              disabled
+              className="relative flex-1 sm:max-w-[160px] flex items-center justify-center gap-2 bg-white border border-stone-200 text-stone-400 px-5 py-2.5 rounded-full text-sm font-medium cursor-not-allowed transition-all whitespace-nowrap"
+            >
+              <Code2 className="w-4 h-4 shrink-0" />
+              <span>{t.getApi}</span>
+              <div className="absolute -top-3 -right-2 bg-stone-100 border-2 border-white text-stone-500 text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider shadow-sm rotate-[10deg]">
+                {t.soonBadge}
+              </div>
+            </button>
+          </div>
+
+          {/* Bottom Row: Mobile App Stores */}
+          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center mt-2">
+            
+            {/* Google Play Button */}
+            <button 
+              disabled
+              className="relative flex-1 sm:max-w-[216px] flex items-center justify-start gap-3 bg-white border border-stone-200 px-5 py-3 rounded-xl cursor-not-allowed transition-all opacity-90 shadow-sm"
+            >
+              <svg className="w-8 h-8 shrink-0" viewBox="0 0 24 24">
+                <path fill="#ea4335" d="M13.544 13.056l-11 10.933c.298.036.612-.016.906-.183l13.324-7.54-3.23-3.21z"/>
+                <path fill="#fbbc04" d="M22.018 13.298l-3.919 2.218-3.515-3.493 3.543-3.521 3.891 2.202a1.49 1.49 0 0 1 0 2.594z"/>
+                <path fill="#4285f4" d="M1.337.924a1.486 1.486 0 0 0-.112.568v21.017c0 .217.045.419.124.6l11.155-11.087L1.337.924z"/>
+                <path fill="#34a853" d="M13.544 10.989l3.258-3.238L3.45.195a1.466 1.466 0 0 0-.946-.179l11.04 10.973z"/>
+              </svg>
+              <div className="flex flex-col items-start leading-none gap-0.5">
+                <span className="text-[11px] uppercase font-semibold text-stone-500 tracking-wider">GET IN ON</span>
+                <span className="text-[20px] font-bold text-stone-900 tracking-tight">Google Play</span>
+              </div>
+              <div className="absolute -top-3 -right-2 bg-stone-100 border-2 border-white text-stone-500 text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm rotate-[10deg]">
+                {t.soonBadge}
+              </div>
+            </button>
+
+            {/* App Store Button */}
+            <button 
+              disabled
+              className="relative flex-1 sm:max-w-[216px] flex items-center justify-start gap-3 bg-white border border-stone-200 px-5 py-3 rounded-xl cursor-not-allowed transition-all opacity-90 shadow-sm"
+            >
+              <svg className="w-9 h-9 shrink-0 fill-black -ml-0.5" viewBox="0 0 24 24">
+                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.19 2.31-.88 3.5-.8 1.45.06 2.65.65 3.39 1.76-2.91 1.73-2.4 5.76.54 7.02-.7 1.83-1.63 3.51-2.51 4.19zm-3.32-14.3c.7-1.05 1.25-2.5 1.11-3.98-1.28.11-2.83.92-3.66 2.02-.69.87-1.33 2.38-1.12 3.84 1.42.15 2.87-.71 3.67-1.88z"/>
+              </svg>
+              <div className="flex flex-col items-start leading-none gap-0.5 -ml-1">
+                <span className="text-[11px] uppercase font-semibold text-stone-500 tracking-wider">Download on the</span>
+                <span className="text-[20px] font-bold text-stone-900 tracking-tight">App Store</span>
+              </div>
+              <div className="absolute -top-3 -right-2 bg-stone-100 border-2 border-white text-stone-500 text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm rotate-[10deg]">
+                {t.soonBadge}
+              </div>
+            </button>
+            
+          </div>
+        </motion.div>
+      </motion.section>
+
+      {/* Features Section */}
+      <section className="bg-emerald-950 text-emerald-50 py-24 px-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-900/50 rounded-full blur-[120px] pointer-events-none translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-900/20 rounded-full blur-[100px] pointer-events-none -translate-x-1/2 translate-y-1/2" />
+
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.2 }}
+          className="w-full max-w-7xl mx-auto relative z-10"
+        >
+          <motion.div variants={itemVariants} className="text-center mb-16">
+            <h2 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold mb-4">{t.coreFeatures}</h2>
+            <div className="w-16 h-1 bg-amber-500 mx-auto rounded-full" />
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {FEATURES.map((feat, idx) => {
+              const Icon = feat.icon;
+              return (
+                <motion.div 
+                  variants={itemVariants}
+                  key={idx} 
+                  className="bg-emerald-900/40 border border-emerald-800/50 p-8 rounded-2xl flex flex-col items-start backdrop-blur-sm"
+                >
+                  <div className="w-12 h-12 bg-emerald-800/80 rounded-xl flex items-center justify-center mb-6 text-amber-400">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3 text-white">{feat.title}</h3>
+                  <p className="text-emerald-100/70 leading-relaxed text-sm">
+                    {feat.desc}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Languages Section */}
+      <motion.section 
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.2 }}
+        className="py-24 px-6 w-full max-w-7xl mx-auto"
+      >
+        <motion.div variants={itemVariants} className="text-center mb-16">
+          <h2 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-emerald-950 mb-4">{t.langTitle}</h2>
+          <p className="text-stone-500">{t.langDesc}</p>
+        </motion.div>
+
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4 max-w-4xl mx-auto">
+          {LANGUAGES.map((lang, idx) => (
+            <motion.div 
+              variants={itemVariants}
+              key={idx}
+              className="bg-white border border-stone-200 text-stone-700 px-6 py-3 rounded-full font-medium shadow-sm flex items-center gap-2"
+            >
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              {lang}
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* About / Support Section */}
+      <section className="bg-stone-100/50 py-24 px-6 border-y border-stone-200/60">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.2 }}
+          className="w-full max-w-3xl mx-auto text-center"
+        >
+          <motion.div variants={itemVariants}>
+            <Heart className="w-10 h-10 text-amber-600 mx-auto mb-6" />
+          </motion.div>
+          <motion.h2 variants={itemVariants} className="font-['Playfair_Display'] text-3xl font-bold text-emerald-950 mb-6">{t.supportTitle}</motion.h2>
+          <motion.p variants={itemVariants} className="text-stone-600 text-lg mb-10 leading-relaxed">
+            {t.supportDesc}
+          </motion.p>
+          <motion.div variants={itemVariants}>
+            <a 
+              href="#" 
+              className="inline-flex items-center justify-center bg-amber-600 hover:bg-amber-700 text-white px-8 py-3.5 rounded-full font-medium transition-all shadow-md shadow-amber-900/10"
+            >
+              {t.supportBtn}
+            </a>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-stone-200 py-16 px-6">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.2 }}
+          className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8"
+        >
+          
+          {/* Brand & Copyright */}
+          <motion.div variants={itemVariants} className="text-center md:text-left flex flex-col justify-center md:justify-start">
+            <div className="font-['Playfair_Display'] text-2xl font-bold text-emerald-900 mb-4">
+              E Qariin.
+            </div>
+            <p className="text-sm text-stone-500 max-w-xs mx-auto md:mx-0 leading-relaxed">
+              {t.footerDesc}
+            </p>
+            <p className="text-sm text-stone-400 mt-6">
+              © 2026 E Qariin Project.<br className="hidden md:block" /> All rights reserved.
+            </p>
+          </motion.div>
+
+          {/* About Us */}
+          <motion.div variants={itemVariants} className="text-center md:text-left">
+            <h4 className="font-bold text-emerald-950 mb-4 uppercase tracking-wider text-sm">{t.aboutTitle}</h4>
+            <div className="flex flex-col items-center md:items-start gap-4 mt-2">
+              <a
+                href="https://x.com/EQariin"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 text-stone-500 hover:text-emerald-700 transition-colors text-sm group"
+              >
+                <div className="w-8 h-8 rounded-full bg-stone-100 group-hover:bg-emerald-50 flex items-center justify-center transition-colors">
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </div>
+                <span className="font-medium">{labels.followX}</span>
+              </a>
+
+              <a
+                href="https://discord.gg/XsHdgf4Eb"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 text-stone-500 hover:text-emerald-700 transition-colors text-sm group"
+              >
+                <div className="w-8 h-8 rounded-full bg-stone-100 group-hover:bg-emerald-50 flex items-center justify-center transition-colors">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                  </svg>
+                </div>
+                <span className="font-medium">{labels.joinDiscord}</span>
+              </a>
+
+              <a
+                href="https://wa.me/6282197362062"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 text-stone-500 hover:text-emerald-700 transition-colors text-sm group"
+              >
+                <div className="w-8 h-8 rounded-full bg-stone-100 group-hover:bg-emerald-50 flex items-center justify-center transition-colors">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c-.001 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                  </svg>
+                </div>
+                <span className="font-medium">{labels.contactWA}</span>
+              </a>
+            </div>
+          </motion.div>
+
+        </motion.div>
+      </footer>
+
+    </div>
+  );
+}

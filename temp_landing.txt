@@ -1,0 +1,309 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Globe, Github, Database, BookOpen, Heart, Code2, ArrowRight, ChevronDown, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { AppLanguage, APP_LANGUAGES } from './constants/uiLabels';
+
+const TRANSLATIONS = [
+  { lang: "Bahasa Indonesia", text: "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang." },
+  { lang: "English", text: "In the name of Allah, the Entirely Merciful, the Especially Merciful." },
+  { lang: "Mandarin", text: "奉至仁至慈的真主之名" },
+  { lang: "Japanese", text: "慈悲あまねく慈愛深きアッラーの御名において。" }
+];
+
+const LANGUAGES = [
+  "Arabic", "Bahasa Indonesia", "English", "Mandarin", 
+  "Spanish", "Japanese", "Turkish", "French", "Malay"
+];
+
+const FEATURES = [
+  {
+    icon: Globe,
+    title: "9 Languages Supported",
+    desc: "Access a broad translation dataset reaching the ummah from various parts of the world."
+  },
+  {
+    icon: BookOpen,
+    title: "Official Sources",
+    desc: "Arabic text and base translations sourced from the Indonesian Ministry of Religion, cross-validated by credible students (santri) to prevent errors and ensure accuracy."
+  },
+  {
+    icon: Database,
+    title: "Open Source Dataset",
+    desc: "All data is publicly available on GitHub to support Islamic app developers worldwide."
+  },
+  {
+    icon: Code2,
+    title: "Continuously Evolving",
+    desc: "Actively adding more languages and new metadata features on an ongoing basis."
+  }
+];
+
+export default function LandingPage() {
+  const navigate = useNavigate();
+  const [currentTransIdx, setCurrentTransIdx] = useState(0);
+  const [appLanguage, setAppLanguage] = useState<AppLanguage>('English');
+  const [isAppLangOpen, setIsAppLangOpen] = useState(false);
+  const appLangRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTransIdx((prev) => (prev + 1) % TRANSLATIONS.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (appLangRef.current && !appLangRef.current.contains(event.target as Node)) {
+        setIsAppLangOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#FDFBF7] text-stone-800 font-sans selection:bg-emerald-900 selection:text-emerald-50">
+      
+      {/* Navbar */}
+      <nav className="w-full max-w-7xl mx-auto px-6 py-8 flex justify-between items-center relative z-10">
+        <div className="font-['Playfair_Display'] text-2xl font-bold text-emerald-900 tracking-tight">
+          E Qariin<span className="text-amber-600">.</span>
+        </div>
+        <div className="flex items-center gap-6">
+          {/* Language Dropdown */}
+          <div className="relative" ref={appLangRef}>
+            <button
+              onClick={() => setIsAppLangOpen(!isAppLangOpen)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-stone-100 text-stone-700 font-medium text-xs rounded-lg border border-stone-200 transition-colors shadow-sm cursor-pointer"
+            >
+              <Globe className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+              <span className="text-stone-900 font-semibold">{appLanguage}</span>
+              <ChevronDown className={`w-3.5 h-3.5 text-stone-400 shrink-0 transition-transform duration-200 ${isAppLangOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {isAppLangOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-stone-200 py-1.5 z-50 max-h-72 overflow-y-auto"
+                >
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 mb-1">
+                    Select Language
+                  </div>
+                  {APP_LANGUAGES.map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => {
+                        setAppLanguage(lang);
+                        setIsAppLangOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-stone-50 transition-colors cursor-pointer ${
+                        appLanguage === lang ? 'font-semibold text-emerald-700 bg-emerald-50/60' : 'text-stone-700'
+                      }`}
+                    >
+                      <span>{lang}</span>
+                      {appLanguage === lang && <Check className="w-3.5 h-3.5 text-emerald-600" />}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative w-full max-w-7xl mx-auto px-6 pt-12 pb-24 md:pt-20 md:pb-32 flex flex-col items-center text-center">
+        {/* Background Decorative Blur */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-2xl h-64 bg-emerald-100/50 blur-[100px] rounded-full pointer-events-none -z-10" />
+
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="font-['Playfair_Display'] text-5xl md:text-7xl font-bold text-emerald-950 tracking-tight mb-6"
+        >
+          E Qariin
+        </motion.h1>
+        
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-lg md:text-xl text-stone-600 max-w-2xl mb-16 leading-relaxed"
+        >
+          Multilingual digital Quran, open dataset for the global ummah. Inspiring limitless Islamic app innovation.
+        </motion.p>
+
+        {/* Quran Verse Display */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+          className="w-full max-w-3xl bg-white border border-stone-200/60 shadow-xl shadow-stone-200/40 rounded-3xl p-8 md:p-12 mb-12 relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-700 via-emerald-600 to-amber-500" />
+          
+          <div className="text-center font-['Amiri'] text-4xl md:text-6xl text-emerald-950 mb-8 leading-[1.8] md:leading-[1.8]" dir="rtl">
+            بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
+          </div>
+          
+          <div className="h-20 flex flex-col justify-center items-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentTransIdx}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4 }}
+                className="text-center"
+              >
+                <p className="text-stone-700 text-lg md:text-xl mb-2 font-medium">
+                  {TRANSLATIONS[currentTransIdx].text}
+                </p>
+                <p className="text-xs tracking-wider text-amber-700 font-semibold uppercase">
+                  {TRANSLATIONS[currentTransIdx].lang}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </motion.div>
+
+        {/* CTA Buttons */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex flex-col sm:flex-row gap-4"
+        >
+          <button 
+            onClick={() => navigate('/app')}
+            className="flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-emerald-50 px-8 py-3.5 rounded-full font-medium transition-all shadow-lg shadow-emerald-900/20"
+          >
+            Try App
+            <ArrowRight className="w-4 h-4" />
+          </button>
+          <a 
+            href="https://github.com/nandibaik090120" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 bg-white border border-stone-200 hover:border-emerald-700 hover:bg-stone-50 text-emerald-950 px-8 py-3.5 rounded-full font-medium transition-all"
+          >
+            <Github className="w-5 h-5" />
+            View on GitHub
+          </a>
+        </motion.div>
+      </section>
+
+      {/* Features Section */}
+      <section className="bg-emerald-950 text-emerald-50 py-24 px-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-900/50 rounded-full blur-[120px] pointer-events-none translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-900/20 rounded-full blur-[100px] pointer-events-none -translate-x-1/2 translate-y-1/2" />
+
+        <div className="w-full max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold mb-4">Core Features</h2>
+            <div className="w-16 h-1 bg-amber-500 mx-auto rounded-full" />
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {FEATURES.map((feat, idx) => {
+              const Icon = feat.icon;
+              return (
+                <div key={idx} className="bg-emerald-900/40 border border-emerald-800/50 p-8 rounded-2xl flex flex-col items-start backdrop-blur-sm">
+                  <div className="w-12 h-12 bg-emerald-800/80 rounded-xl flex items-center justify-center mb-6 text-amber-400">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3 text-white">{feat.title}</h3>
+                  <p className="text-emerald-100/70 leading-relaxed text-sm">
+                    {feat.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Languages Section */}
+      <section className="py-24 px-6 w-full max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-emerald-950 mb-4">9 Available Languages</h2>
+          <p className="text-stone-500">Covering major world languages for limitless accessibility.</p>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4 max-w-4xl mx-auto">
+          {LANGUAGES.map((lang, idx) => (
+            <div 
+              key={idx}
+              className="bg-white border border-stone-200 text-stone-700 px-6 py-3 rounded-full font-medium shadow-sm flex items-center gap-2"
+            >
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              {lang}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* About / Support Section */}
+      <section className="bg-stone-100/50 py-24 px-6 border-y border-stone-200/60">
+        <div className="w-full max-w-3xl mx-auto text-center">
+          <Heart className="w-10 h-10 text-amber-600 mx-auto mb-6" />
+          <h2 className="font-['Playfair_Display'] text-3xl font-bold text-emerald-950 mb-6">Support Development</h2>
+          <p className="text-stone-600 text-lg mb-10 leading-relaxed">
+            E Qariin is in active development. We aim to provide a perfect Quran dataset for the entire ummah. Support us on LaunchGood to keep this project running and enable the addition of more languages.
+          </p>
+          <a 
+            href="#" 
+            className="inline-flex items-center justify-center bg-amber-600 hover:bg-amber-700 text-white px-8 py-3.5 rounded-full font-medium transition-all shadow-md shadow-amber-900/10"
+          >
+            Support via LaunchGood
+          </a>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-stone-200 py-16 px-6">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+          
+          {/* Brand & Copyright */}
+          <div className="text-center md:text-left flex flex-col justify-center md:justify-start">
+            <div className="font-['Playfair_Display'] text-2xl font-bold text-emerald-900 mb-4">
+              E Qariin.
+            </div>
+            <p className="text-sm text-stone-500 max-w-xs mx-auto md:mx-0 leading-relaxed">
+              An open-source multilingual Quran dataset platform, dedicated to driving global Islamic app innovation.
+            </p>
+            <p className="text-sm text-stone-400 mt-6">
+              © 2026 E Qariin Project.<br className="hidden md:block" /> All rights reserved.
+            </p>
+          </div>
+
+          {/* About Us */}
+          <div className="text-center md:text-left">
+            <h4 className="font-bold text-emerald-950 mb-4 uppercase tracking-wider text-sm">About Us</h4>
+            <p className="text-sm text-stone-500 leading-relaxed">
+              E Qariin began with a mission to provide a structured, accessible, and multilingual Quran dataset for developers, academics, and Muslim researchers worldwide.
+            </p>
+          </div>
+          
+          {/* Credits & Links */}
+          <div className="text-center md:text-right text-sm text-stone-500 flex flex-col items-center md:items-end">
+            <h4 className="font-bold text-emerald-950 mb-4 uppercase tracking-wider text-sm">Sources & Links</h4>
+            <p className="mb-4 max-w-[250px]">Arabic text & base translations officially sourced from the <span className="font-medium text-stone-700">Indonesian Ministry of Religion</span>.</p>
+            <div className="flex items-center justify-center md:justify-end gap-6 mt-2">
+              <a href="#" className="hover:text-emerald-700 transition-colors font-medium">Contact</a>
+              <a href="https://github.com/nandibaik090120" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-700 transition-colors font-medium">GitHub</a>
+            </div>
+          </div>
+
+        </div>
+      </footer>
+
+    </div>
+  );
+}

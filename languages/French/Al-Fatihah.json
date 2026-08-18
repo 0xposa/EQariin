@@ -1,0 +1,36 @@
+{
+  "surah_number": 1,
+  "surah_name": "Al-Fatihah",
+  "revelation_place": "Makkiyyah",
+  "verse_count": 7,
+  "verses": [
+    {
+      "verse_number": 1,
+      "text": "Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux."
+    },
+    {
+      "verse_number": 2,
+      "text": "Louange à Allah, Seigneur de l'univers."
+    },
+    {
+      "verse_number": 3,
+      "text": "Le Tout Miséricordieux, le Très Miséricordieux,"
+    },
+    {
+      "verse_number": 4,
+      "text": "Maître du Jour de la rétribution."
+    },
+    {
+      "verse_number": 5,
+      "text": "C'est Toi seul que nous adorons, et c'est Toi seul dont nous implorons le secours."
+    },
+    {
+      "verse_number": 6,
+      "text": "Guide-nous dans le droit chemin,"
+    },
+    {
+      "verse_number": 7,
+      "text": "Le chemin de ceux que Tu as comblés de Tes bienfaits, non pas de ceux qui ont encouru Ta colère, ni des égarés."
+    }
+  ]
+}
