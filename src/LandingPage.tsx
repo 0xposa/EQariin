@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Github, Database, BookOpen, Heart, Code2, ArrowRight, ChevronDown, Check, ExternalLink, Search, Clock, Sparkles } from 'lucide-react';
+import { Globe, Github, Database, BookOpen, Heart, Code2, ArrowRight, ChevronDown, Check, ExternalLink, Search, Clock, Sparkles, MapPin } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { AppLanguage, APP_LANGUAGES, UI_LABELS } from './constants/uiLabels';
 import { LANDING_TRANSLATIONS } from './constants/landingTranslations';
@@ -51,7 +51,7 @@ export default function LandingPage() {
         !query ||
         item.name.toLowerCase().includes(query) ||
         item.nativeName.toLowerCase().includes(query) ||
-        (item.countryOrSpeakerArea && item.countryOrSpeakerArea.toLowerCase().includes(query)) ||
+        item.countries.toLowerCase().includes(query) ||
         item.region.toLowerCase().includes(query);
 
       return matchesStatus && matchesRegion && matchesQuery;
@@ -455,7 +455,7 @@ export default function LandingPage() {
 
         {/* World Languages Grid */}
         {filteredLanguages.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 md:gap-4 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 max-w-6xl mx-auto">
             {filteredLanguages.map((lang) => {
               const isAvailable = lang.status === 'available';
 
@@ -470,46 +470,42 @@ export default function LandingPage() {
                   }}
                   className={`group relative p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between ${
                     isAvailable
-                      ? 'bg-white border-emerald-200/90 shadow-sm hover:shadow-md hover:border-emerald-500 cursor-pointer'
-                      : 'bg-white/80 border-stone-200/90 shadow-2xs hover:bg-white hover:border-stone-300 cursor-default'
+                      ? 'bg-white border-emerald-300 shadow-sm hover:shadow-md hover:border-emerald-600 cursor-pointer ring-1 ring-emerald-100'
+                      : 'bg-white/90 border-stone-200/90 shadow-2xs hover:bg-white hover:border-stone-300 cursor-default'
                   }`}
                 >
                   <div>
-                    {/* Header: Name and Status Badge */}
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="font-semibold text-stone-900 text-sm md:text-base tracking-tight group-hover:text-emerald-900 transition-colors">
-                        {lang.name}
-                      </h3>
+                    {/* Top: Language Name & Status Badge */}
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <div>
+                        <h3 className="font-bold text-stone-900 text-sm md:text-base tracking-tight group-hover:text-emerald-900 transition-colors leading-snug">
+                          {lang.name}
+                        </h3>
+                        <div className="font-['Amiri'] text-stone-500 group-hover:text-emerald-950 text-xs md:text-sm font-normal tracking-wide mt-0.5">
+                          {lang.nativeName}
+                        </div>
+                      </div>
                       
                       {isAvailable ? (
-                        <span className="shrink-0 inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-800 bg-emerald-50/90 border border-emerald-200 px-2 py-0.5 rounded-full">
+                        <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                           {t.langAvailableBadge}
                         </span>
                       ) : (
-                        <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-300/90 px-2.5 py-0.5 rounded-full shadow-xs">
+                        <span className="shrink-0 inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-300/80 px-2 py-0.5 rounded-full shadow-2xs">
                           <Clock className="w-2.5 h-2.5 text-amber-700" />
                           {t.soonBadge}
                         </span>
                       )}
                     </div>
-
-                    {/* Native Script */}
-                    <div className="font-['Amiri'] text-stone-600 group-hover:text-emerald-950 text-base md:text-lg mb-2 font-medium tracking-wide">
-                      {lang.nativeName}
-                    </div>
                   </div>
 
-                  {/* Footer info: Country/Region & Action hint */}
-                  <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-400">
-                    <span className="truncate max-w-[170px]" title={lang.countryOrSpeakerArea}>
-                      {lang.countryOrSpeakerArea || lang.region}
+                  {/* Countries Info */}
+                  <div className="pt-2.5 mt-2 border-t border-stone-100 flex items-start gap-1.5 text-[11px] text-stone-500">
+                    <MapPin className="w-3 h-3 text-stone-400 shrink-0 mt-0.5" />
+                    <span className="line-clamp-2 leading-relaxed" title={lang.countries}>
+                      {lang.countries}
                     </span>
-                    {isAvailable && (
-                      <span className="text-emerald-700 font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
-                        Open <ArrowRight className="w-3 h-3" />
-                      </span>
-                    )}
                   </div>
                 </motion.div>
               );
