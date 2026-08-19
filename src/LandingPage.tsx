@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Github, Database, BookOpen, Heart, Code2, ArrowRight, ChevronDown, Check, ExternalLink, Search, Clock, Sparkles, MapPin } from 'lucide-react';
+import { Globe, Github, Database, BookOpen, TrendingUp, Handshake, Code2, ArrowRight, ChevronDown, Check, ExternalLink, Search, Clock, Sparkles, MapPin } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { AppLanguage, APP_LANGUAGES, UI_LABELS } from './constants/uiLabels';
 import { LANDING_TRANSLATIONS } from './constants/landingTranslations';
@@ -66,8 +66,8 @@ export default function LandingPage() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.1,
+        staggerChildren: 0.08,
+        delayChildren: 0.04,
       },
     },
   };
@@ -75,14 +75,14 @@ export default function LandingPage() {
   const itemVariants = {
     hidden: { 
       opacity: shouldReduceMotion ? 1 : 0, 
-      y: shouldReduceMotion ? 0 : 25 
+      y: shouldReduceMotion ? 0 : 16 
     },
     visible: {
       opacity: 1,
       y: 0,
       transition: { 
-        duration: 0.8, 
-        ease: [0.22, 1, 0.36, 1] 
+        duration: 0.5, 
+        ease: [0.25, 1, 0.5, 1] 
       },
     },
   };
@@ -188,7 +188,7 @@ export default function LandingPage() {
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.1 }}
         className="relative w-full max-w-7xl mx-auto px-6 pt-12 pb-24 md:pt-20 md:pb-32 flex flex-col items-center text-center"
       >
         {/* Background Decorative Blur */}
@@ -219,14 +219,14 @@ export default function LandingPage() {
             بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
           </div>
           
-          <div className="h-20 flex flex-col justify-center items-center">
+          <div className="min-h-[5.5rem] flex flex-col justify-center items-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentTransIdx}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
                 className="text-center"
               >
                 <p className="text-stone-700 text-lg md:text-xl mb-2 font-medium">
@@ -319,7 +319,7 @@ export default function LandingPage() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.15 }}
           className="w-full max-w-7xl mx-auto relative z-10"
         >
           <motion.div variants={itemVariants} className="text-center mb-16">
@@ -356,7 +356,7 @@ export default function LandingPage() {
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.1 }}
+        viewport={{ once: true, amount: 0.05 }}
         className="py-24 px-6 w-full max-w-7xl mx-auto"
       >
         <motion.div variants={itemVariants} className="text-center mb-12">
@@ -460,28 +460,22 @@ export default function LandingPage() {
               const isAvailable = lang.status === 'available';
 
               return (
-                <motion.div
-                  variants={itemVariants}
+                <div
                   key={lang.id}
-                  onClick={() => {
-                    if (isAvailable) {
-                      navigate('/app');
-                    }
-                  }}
-                  className={`group relative p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between ${
+                  className={`relative p-4 rounded-2xl border transition-all duration-150 flex flex-col justify-between ${
                     isAvailable
-                      ? 'bg-white border-emerald-300 shadow-sm hover:shadow-md hover:border-emerald-600 cursor-pointer ring-1 ring-emerald-100'
-                      : 'bg-white/90 border-stone-200/90 shadow-2xs hover:bg-white hover:border-stone-300 cursor-default'
+                      ? 'bg-white border-emerald-300 shadow-sm ring-1 ring-emerald-100'
+                      : 'bg-white/90 border-stone-200/90 shadow-2xs'
                   }`}
                 >
                   <div>
                     {/* Top: Language Name & Status Badge */}
                     <div className="flex items-start justify-between gap-2 mb-1.5">
                       <div>
-                        <h3 className="font-bold text-stone-900 text-sm md:text-base tracking-tight group-hover:text-emerald-900 transition-colors leading-snug">
+                        <h3 className="font-bold text-stone-900 text-sm md:text-base tracking-tight leading-snug">
                           {lang.name}
                         </h3>
-                        <div className="font-['Amiri'] text-stone-500 group-hover:text-emerald-950 text-xs md:text-sm font-normal tracking-wide mt-0.5">
+                        <div className="font-['Amiri'] text-stone-500 text-xs md:text-sm font-normal tracking-wide mt-0.5">
                           {lang.nativeName}
                         </div>
                       </div>
@@ -507,7 +501,7 @@ export default function LandingPage() {
                       {lang.countries}
                     </span>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -531,28 +525,39 @@ export default function LandingPage() {
         )}
       </motion.section>
 
-      {/* About / Support Section */}
-      <section className="bg-stone-100/50 py-24 px-6 border-y border-stone-200/60">
+      {/* Investor & Strategic Partnership Section */}
+      <section className="bg-gradient-to-b from-stone-50 via-white to-stone-50 py-24 px-6 border-y border-stone-200/70 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-50/70 blur-[90px] rounded-full pointer-events-none -z-10" />
+
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.15 }}
           className="w-full max-w-3xl mx-auto text-center"
         >
-          <motion.div variants={itemVariants}>
-            <Heart className="w-10 h-10 text-amber-600 mx-auto mb-6" />
+          <motion.div variants={itemVariants} className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-900 text-emerald-300 shadow-md shadow-emerald-950/15 mb-6 ring-4 ring-emerald-50">
+            <TrendingUp className="w-7 h-7" />
           </motion.div>
-          <motion.h2 variants={itemVariants} className="font-['Playfair_Display'] text-3xl font-bold text-emerald-950 mb-6">{t.supportTitle}</motion.h2>
-          <motion.p variants={itemVariants} className="text-stone-600 text-lg mb-10 leading-relaxed">
-            {t.supportDesc}
+          
+          <motion.h2 variants={itemVariants} className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-emerald-950 mb-5 tracking-tight">
+            {t.investorTitle}
+          </motion.h2>
+          
+          <motion.p variants={itemVariants} className="text-stone-600 text-base md:text-lg mb-10 leading-relaxed max-w-2xl mx-auto">
+            {t.investorDesc}
           </motion.p>
-          <motion.div variants={itemVariants}>
+          
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a 
-              href="#" 
-              className="inline-flex items-center justify-center bg-amber-600 hover:bg-amber-700 text-white px-8 py-3.5 rounded-full font-medium transition-all shadow-md shadow-amber-900/10"
+              href="https://wa.me/6282197362062?text=Halo%20Tim%20E%20Qariin%2C%20saya%20tertarik%20untuk%20membahas%20peluang%20investasi%20%2F%20kemitraan%20strategis." 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2.5 bg-emerald-900 hover:bg-emerald-950 text-white px-8 py-4 rounded-full font-semibold text-sm transition-all shadow-lg shadow-emerald-950/20 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
             >
-              {t.supportBtn}
+              <Handshake className="w-4 h-4 text-emerald-300" />
+              <span>{t.investorBtn}</span>
+              <ArrowRight className="w-4 h-4 text-emerald-300 ml-0.5" />
             </a>
           </motion.div>
         </motion.div>
@@ -564,7 +569,7 @@ export default function LandingPage() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.1 }}
           className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8"
         >
           
