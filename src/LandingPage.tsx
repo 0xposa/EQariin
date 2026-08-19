@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Github, Database, BookOpen, Heart, Code2, ArrowRight, ChevronDown, Check, ExternalLink } from 'lucide-react';
+import { Globe, Github, Database, BookOpen, Heart, Code2, ArrowRight, ChevronDown, Check, ExternalLink, Search, Clock, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { AppLanguage, APP_LANGUAGES, UI_LABELS } from './constants/uiLabels';
 import { LANDING_TRANSLATIONS } from './constants/landingTranslations';
+import { WORLD_LANGUAGES, WorldLanguageItem, LanguageRegion, LanguageStatus } from './constants/worldLanguages';
 
 const TRANSLATIONS = [
   { lang: "Bahasa Indonesia", text: "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang." },
@@ -12,9 +13,14 @@ const TRANSLATIONS = [
   { lang: "Japanese", text: "慈悲あまねく慈愛深きアッラーの御名において。" }
 ];
 
-const LANGUAGES = [
-  "Arabic", "Bahasa Indonesia", "English", "Mandarin", 
-  "Spanish", "Japanese", "Turkish", "French", "Malay"
+const REGIONS: LanguageRegion[] = [
+  'All',
+  'Middle East & North Africa',
+  'South & Central Asia',
+  'East & Southeast Asia',
+  'Europe',
+  'Africa',
+  'Americas & Oceania'
 ];
 
 export default function LandingPage() {
@@ -24,10 +30,36 @@ export default function LandingPage() {
   const [isAppLangOpen, setIsAppLangOpen] = useState(false);
   const appLangRef = useRef<HTMLDivElement>(null);
 
+  // World languages filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'available' | 'soon'>('all');
+  const [selectedRegion, setSelectedRegion] = useState<LanguageRegion>('All');
+
   const t = LANDING_TRANSLATIONS[appLanguage] || LANDING_TRANSLATIONS['English'];
   const labels = UI_LABELS[appLanguage] || UI_LABELS['English'];
   
   const shouldReduceMotion = useReducedMotion();
+
+  const filteredLanguages = useMemo(() => {
+    return WORLD_LANGUAGES.filter((item) => {
+      const matchesStatus =
+        statusFilter === 'all' || item.status === statusFilter;
+      const matchesRegion =
+        selectedRegion === 'All' || item.region === selectedRegion;
+      const query = searchQuery.trim().toLowerCase();
+      const matchesQuery =
+        !query ||
+        item.name.toLowerCase().includes(query) ||
+        item.nativeName.toLowerCase().includes(query) ||
+        (item.countryOrSpeakerArea && item.countryOrSpeakerArea.toLowerCase().includes(query)) ||
+        item.region.toLowerCase().includes(query);
+
+      return matchesStatus && matchesRegion && matchesQuery;
+    });
+  }, [statusFilter, selectedRegion, searchQuery]);
+
+  const availableCount = useMemo(() => WORLD_LANGUAGES.filter(l => l.status === 'available').length, []);
+  const soonCount = useMemo(() => WORLD_LANGUAGES.filter(l => l.status === 'soon').length, []);
 
   const containerVariants = {
     hidden: { opacity: shouldReduceMotion ? 1 : 0 },
@@ -320,29 +352,187 @@ export default function LandingPage() {
 
       {/* Languages Section */}
       <motion.section 
+        id="world-languages"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: false, amount: 0.1 }}
         className="py-24 px-6 w-full max-w-7xl mx-auto"
       >
-        <motion.div variants={itemVariants} className="text-center mb-16">
-          <h2 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-emerald-950 mb-4">{t.langTitle}</h2>
-          <p className="text-stone-500">{t.langDesc}</p>
+        <motion.div variants={itemVariants} className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
+            <Globe className="w-3.5 h-3.5 text-emerald-600" />
+            <span>{WORLD_LANGUAGES.length}+ Global Datasets</span>
+          </div>
+          <h2 className="font-['Playfair_Display'] text-3xl md:text-5xl font-bold text-emerald-950 mb-4">{t.langTitle}</h2>
+          <p className="text-stone-600 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">{t.langDesc}</p>
         </motion.div>
 
-        <div className="flex flex-wrap justify-center gap-3 md:gap-4 max-w-4xl mx-auto">
-          {LANGUAGES.map((lang, idx) => (
-            <motion.div 
-              variants={itemVariants}
-              key={idx}
-              className="bg-white border border-stone-200 text-stone-700 px-6 py-3 rounded-full font-medium shadow-sm flex items-center gap-2"
+        {/* Filter & Search Bar */}
+        <motion.div variants={itemVariants} className="w-full max-w-4xl mx-auto mb-10 flex flex-col gap-4">
+          
+          {/* Top Row: Status Tabs & Search Bar */}
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch justify-between">
+            {/* Status Switcher Tabs */}
+            <div className="flex items-center bg-stone-100 p-1 rounded-xl border border-stone-200 shadow-inner">
+              <button
+                type="button"
+                onClick={() => setStatusFilter('all')}
+                className={`flex-1 sm:flex-initial px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                  statusFilter === 'all'
+                    ? 'bg-white text-emerald-950 shadow-sm'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                {t.langFilterAll} ({WORLD_LANGUAGES.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('available')}
+                className={`flex-1 sm:flex-initial px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap ${
+                  statusFilter === 'available'
+                    ? 'bg-white text-emerald-700 shadow-sm'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                {t.langFilterAvailable} ({availableCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('soon')}
+                className={`flex-1 sm:flex-initial px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap ${
+                  statusFilter === 'soon'
+                    ? 'bg-white text-amber-700 shadow-sm'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                {t.langFilterSoon} ({soonCount})
+              </button>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative flex-1 sm:max-w-xs">
+              <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t.langSearchPlaceholder}
+                className="w-full bg-white border border-stone-200 rounded-xl pl-10 pr-4 py-2 text-xs md:text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all shadow-sm"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-400 hover:text-stone-600"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom Row: Region Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+            {REGIONS.map((region) => (
+              <button
+                key={region}
+                type="button"
+                onClick={() => setSelectedRegion(region)}
+                className={`px-3.5 py-1.5 rounded-full font-medium transition-all cursor-pointer whitespace-nowrap text-xs border ${
+                  selectedRegion === region
+                    ? 'bg-emerald-900 text-white border-emerald-900 shadow-xs'
+                    : 'bg-white text-stone-600 border-stone-200/80 hover:bg-stone-50 hover:text-stone-900'
+                }`}
+              >
+                {region === 'All' ? 'All Regions' : region}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* World Languages Grid */}
+        {filteredLanguages.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 md:gap-4 max-w-6xl mx-auto">
+            {filteredLanguages.map((lang) => {
+              const isAvailable = lang.status === 'available';
+
+              return (
+                <motion.div
+                  variants={itemVariants}
+                  key={lang.id}
+                  onClick={() => {
+                    if (isAvailable) {
+                      navigate('/app');
+                    }
+                  }}
+                  className={`group relative p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between ${
+                    isAvailable
+                      ? 'bg-white border-emerald-200/90 shadow-sm hover:shadow-md hover:border-emerald-500 cursor-pointer'
+                      : 'bg-white/80 border-stone-200/90 shadow-2xs hover:bg-white hover:border-stone-300 cursor-default'
+                  }`}
+                >
+                  <div>
+                    {/* Header: Name and Status Badge */}
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="font-semibold text-stone-900 text-sm md:text-base tracking-tight group-hover:text-emerald-900 transition-colors">
+                        {lang.name}
+                      </h3>
+                      
+                      {isAvailable ? (
+                        <span className="shrink-0 inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-800 bg-emerald-50/90 border border-emerald-200 px-2 py-0.5 rounded-full">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                          {t.langAvailableBadge}
+                        </span>
+                      ) : (
+                        <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-300/90 px-2.5 py-0.5 rounded-full shadow-xs">
+                          <Clock className="w-2.5 h-2.5 text-amber-700" />
+                          {t.soonBadge}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Native Script */}
+                    <div className="font-['Amiri'] text-stone-600 group-hover:text-emerald-950 text-base md:text-lg mb-2 font-medium tracking-wide">
+                      {lang.nativeName}
+                    </div>
+                  </div>
+
+                  {/* Footer info: Country/Region & Action hint */}
+                  <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-400">
+                    <span className="truncate max-w-[170px]" title={lang.countryOrSpeakerArea}>
+                      {lang.countryOrSpeakerArea || lang.region}
+                    </span>
+                    {isAvailable && (
+                      <span className="text-emerald-700 font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                        Open <ArrowRight className="w-3 h-3" />
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-white border border-stone-200 rounded-3xl max-w-xl mx-auto shadow-sm">
+            <Globe className="w-10 h-10 text-stone-300 mx-auto mb-3" />
+            <h4 className="text-base font-semibold text-stone-700 mb-1">No languages found</h4>
+            <p className="text-xs text-stone-400 mb-4">Try clearing filters or search terms.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setStatusFilter('all');
+                setSelectedRegion('All');
+              }}
+              className="px-4 py-2 bg-emerald-800 text-emerald-50 rounded-full text-xs font-medium hover:bg-emerald-900 transition-all cursor-pointer"
             >
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
-              {lang}
-            </motion.div>
-          ))}
-        </div>
+              Reset Filters
+            </button>
+          </div>
+        )}
       </motion.section>
 
       {/* About / Support Section */}
