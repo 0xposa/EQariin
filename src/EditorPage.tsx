@@ -393,7 +393,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-stone-900 tracking-tight">
-                E Qariin
+                Muslim Plus
               </h1>
               <p className="text-xs text-stone-500">
                 Global Quran Metadata
@@ -509,7 +509,7 @@ export default function App() {
                       {labels.investorRelations}
                     </div>
                     <a
-                      href="https://wa.me/6282197362062?text=Hello%20I%20am%20interested%20in%20becoming%20an%20investor%20for%20E%20Qariin"
+                      href="https://wa.me/6282197362062?text=Hello%20I%20am%20interested%20in%20becoming%20an%20investor%20for%20Muslim%20Plus"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-between px-3 py-2 bg-stone-900 hover:bg-stone-800 text-white rounded-lg text-xs font-medium transition-colors shadow-2xs"

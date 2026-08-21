@@ -134,7 +134,7 @@ export default function LandingPage() {
       <nav className="w-full bg-emerald-950 text-emerald-50 relative z-20 shadow-md">
         <div className="w-full max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
           <div className="font-['Playfair_Display'] text-2xl font-bold tracking-tight">
-            E Qariin<span className="text-emerald-400">.</span>
+            Muslim Plus<span className="text-emerald-400">.</span>
           </div>
           <div className="flex items-center gap-6">
             {/* Language Dropdown */}
@@ -198,7 +198,7 @@ export default function LandingPage() {
           variants={itemVariants}
           className="font-['Playfair_Display'] text-5xl md:text-7xl font-bold text-emerald-950 tracking-tight mb-6"
         >
-          E Qariin
+          Muslim Plus
         </motion.h1>
         
         <motion.p 
@@ -309,6 +309,44 @@ export default function LandingPage() {
           </div>
         </motion.div>
       </motion.section>
+
+      {/* Investor & Strategic Partnership Section */}
+      <section className="bg-gradient-to-b from-stone-50 via-white to-stone-50 py-24 px-6 border-y border-stone-200/70 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-50/70 blur-[90px] rounded-full pointer-events-none -z-10" />
+
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          className="w-full max-w-3xl mx-auto text-center"
+        >
+          <motion.div variants={itemVariants} className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-900 text-emerald-300 shadow-md shadow-emerald-950/15 mb-6 ring-4 ring-emerald-50">
+            <TrendingUp className="w-7 h-7" />
+          </motion.div>
+          
+          <motion.h2 variants={itemVariants} className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-emerald-950 mb-5 tracking-tight">
+            {t.investorTitle}
+          </motion.h2>
+          
+          <motion.p variants={itemVariants} className="text-stone-600 text-base md:text-lg mb-10 leading-relaxed max-w-2xl mx-auto">
+            {t.investorDesc}
+          </motion.p>
+          
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a 
+              href="https://wa.me/6282197362062?text=Halo%20Tim%20Muslim%20Plus%2C%20saya%20tertarik%20untuk%20membahas%20peluang%20investasi%20%2F%20kemitraan%20strategis." 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2.5 bg-emerald-900 hover:bg-emerald-950 text-white px-8 py-4 rounded-full font-semibold text-sm transition-all shadow-lg shadow-emerald-950/20 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
+            >
+              <Handshake className="w-4 h-4 text-emerald-300" />
+              <span>{t.investorBtn}</span>
+              <ArrowRight className="w-4 h-4 text-emerald-300 ml-0.5" />
+            </a>
+          </motion.div>
+        </motion.div>
+      </section>
 
       {/* Features Section */}
       <section className="bg-emerald-950 text-emerald-50 py-24 px-6 relative overflow-hidden">
@@ -525,44 +563,6 @@ export default function LandingPage() {
         )}
       </motion.section>
 
-      {/* Investor & Strategic Partnership Section */}
-      <section className="bg-gradient-to-b from-stone-50 via-white to-stone-50 py-24 px-6 border-y border-stone-200/70 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-50/70 blur-[90px] rounded-full pointer-events-none -z-10" />
-
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-          className="w-full max-w-3xl mx-auto text-center"
-        >
-          <motion.div variants={itemVariants} className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-900 text-emerald-300 shadow-md shadow-emerald-950/15 mb-6 ring-4 ring-emerald-50">
-            <TrendingUp className="w-7 h-7" />
-          </motion.div>
-          
-          <motion.h2 variants={itemVariants} className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-emerald-950 mb-5 tracking-tight">
-            {t.investorTitle}
-          </motion.h2>
-          
-          <motion.p variants={itemVariants} className="text-stone-600 text-base md:text-lg mb-10 leading-relaxed max-w-2xl mx-auto">
-            {t.investorDesc}
-          </motion.p>
-          
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a 
-              href="https://wa.me/6282197362062?text=Halo%20Tim%20E%20Qariin%2C%20saya%20tertarik%20untuk%20membahas%20peluang%20investasi%20%2F%20kemitraan%20strategis." 
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2.5 bg-emerald-900 hover:bg-emerald-950 text-white px-8 py-4 rounded-full font-semibold text-sm transition-all shadow-lg shadow-emerald-950/20 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
-            >
-              <Handshake className="w-4 h-4 text-emerald-300" />
-              <span>{t.investorBtn}</span>
-              <ArrowRight className="w-4 h-4 text-emerald-300 ml-0.5" />
-            </a>
-          </motion.div>
-        </motion.div>
-      </section>
-
       {/* Footer */}
       <footer className="bg-white border-t border-stone-200 py-16 px-6">
         <motion.div 
@@ -576,13 +576,13 @@ export default function LandingPage() {
           {/* Brand & Copyright */}
           <motion.div variants={itemVariants} className="text-center md:text-left flex flex-col justify-center md:justify-start">
             <div className="font-['Playfair_Display'] text-2xl font-bold text-emerald-900 mb-4">
-              E Qariin.
+              Muslim Plus.
             </div>
             <p className="text-sm text-stone-500 max-w-xs mx-auto md:mx-0 leading-relaxed">
               {t.footerDesc}
             </p>
             <p className="text-sm text-stone-400 mt-6">
-              © 2026 E Qariin Project.<br className="hidden md:block" /> All rights reserved.
+              © 2026 Muslim Plus Project.<br className="hidden md:block" /> All rights reserved.
             </p>
           </motion.div>
 
