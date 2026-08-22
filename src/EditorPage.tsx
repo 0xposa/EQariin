@@ -275,14 +275,42 @@ export default function App() {
   const [selectedFolder, setSelectedFolder] = useState<string>(() => folders[0] || 'Bahasa Indonesia');
   const [viewMode, setViewMode] = useState<'code' | 'preview'>('code');
   
-  // Get list of files in the selected folder
+  // Get list of files in the selected folder, sorted by surah_number in JSON
   const folderFiles = useMemo(() => {
-    return files.filter((f) => f.folder === selectedFolder);
+    const list = files.filter((f) => f.folder === selectedFolder);
+    return list.sort((a, b) => {
+      let numA = 999;
+      let numB = 999;
+      try {
+        const parsedA = JSON.parse(a.content);
+        if (typeof parsedA.surah_number === 'number') numA = parsedA.surah_number;
+      } catch {}
+      try {
+        const parsedB = JSON.parse(b.content);
+        if (typeof parsedB.surah_number === 'number') numB = parsedB.surah_number;
+      } catch {}
+
+      if (numA !== numB) return numA - numB;
+      return a.fileName.localeCompare(b.fileName);
+    });
   }, [files, selectedFolder]);
 
   const [selectedFileName, setSelectedFileName] = useState<string>(() => {
-    const firstInFolder = files.find((f) => f.folder === (folders[0] || 'Bahasa Indonesia'));
-    return firstInFolder ? firstInFolder.fileName : '';
+    const indonesiaFiles = files.filter((f) => f.folder === (folders[0] || 'Bahasa Indonesia'));
+    const sorted = [...indonesiaFiles].sort((a, b) => {
+      let numA = 999;
+      let numB = 999;
+      try {
+        const parsedA = JSON.parse(a.content);
+        if (typeof parsedA.surah_number === 'number') numA = parsedA.surah_number;
+      } catch {}
+      try {
+        const parsedB = JSON.parse(b.content);
+        if (typeof parsedB.surah_number === 'number') numB = parsedB.surah_number;
+      } catch {}
+      return numA - numB;
+    });
+    return sorted[0] ? sorted[0].fileName : '';
   });
 
   const [copied, setCopied] = useState(false);
@@ -336,9 +364,21 @@ export default function App() {
 
   const handleSelectFolder = (folderName: string) => {
     setSelectedFolder(folderName);
-    const firstFile = files.find((f) => f.folder === folderName);
-    if (firstFile) {
-      setSelectedFileName(firstFile.fileName);
+    const targetFolderFiles = files.filter((f) => f.folder === folderName).sort((a, b) => {
+      let numA = 999;
+      let numB = 999;
+      try {
+        const parsedA = JSON.parse(a.content);
+        if (typeof parsedA.surah_number === 'number') numA = parsedA.surah_number;
+      } catch {}
+      try {
+        const parsedB = JSON.parse(b.content);
+        if (typeof parsedB.surah_number === 'number') numB = parsedB.surah_number;
+      } catch {}
+      return numA - numB;
+    });
+    if (targetFolderFiles.length > 0) {
+      setSelectedFileName(targetFolderFiles[0].fileName);
     } else {
       setSelectedFileName('');
     }
