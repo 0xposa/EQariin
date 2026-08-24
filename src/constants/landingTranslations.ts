@@ -2,6 +2,7 @@ import { AppLanguage } from './uiLabels';
 
 export interface LandingTranslation {
   heroDesc: string;
+  innaLillahiQuote: string;
   tryApp: string;
   viewGithub: string;
   getApi: string;
@@ -37,6 +38,7 @@ export interface LandingTranslation {
 export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
   English: {
     heroDesc: "Multilingual digital Quran, open dataset for global Muslims. Inspiring limitless Islamic app innovation.",
+    innaLillahiQuote: "Indeed, to Allah we belong and to Him we shall return.",
     tryApp: "Try App",
     viewGithub: "View on GitHub",
     getApi: "Get API",
@@ -70,6 +72,7 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
   },
   "Bahasa Indonesia": {
     heroDesc: "Al-Quran digital multibahasa, dataset terbuka untuk kaum muslim sedunia. Menginspirasi inovasi aplikasi Islami tanpa batas.",
+    innaLillahiQuote: "Sesungguhnya kami adalah milik Allah dan sesungguhnya kepada-Nya kami kembali.",
     tryApp: "Coba Aplikasi",
     viewGithub: "Lihat di GitHub",
     getApi: "Get API",
@@ -103,6 +106,7 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
   },
   Arabic: {
     heroDesc: "قرآن رقمي متعدد اللغات، قاعدة بيانات مفتوحة للمسلمين في جميع أنحاء العالم. إلهام لابتكار تطبيقات إسلامية بلا حدود.",
+    innaLillahiQuote: "إِنَّا لِلّٰهِ وَإِنَّا إِلَيْهِ رَاجِعُوْنَ",
     tryApp: "جرب التطبيق",
     viewGithub: "عرض على GitHub",
     getApi: "احصل على API",
@@ -136,6 +140,7 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
   },
   Mandarin: {
     heroDesc: "多语言数字古兰经，面向全球穆斯林的开放数据集。激发无限的伊斯兰应用创新。",
+    innaLillahiQuote: "“我们确是真主所有的，我们必定要归依他。”",
     tryApp: "体验应用",
     viewGithub: "在 GitHub 上查看",
     getApi: "获取 API",
@@ -169,6 +174,7 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
   },
   Spanish: {
     heroDesc: "Corán digital multilingüe, conjunto de datos abierto para los musulmanes de todo el mundo. Inspirando innovación en aplicaciones islámicas.",
+    innaLillahiQuote: "“En verdad pertenecemos a Al-lah y a Él hemos de retornar.”",
     tryApp: "Probar la aplicación",
     viewGithub: "Ver en GitHub",
     getApi: "Obtener API",
@@ -202,6 +208,7 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
   },
   Japanese: {
     heroDesc: "多言語対応のデジタルコーラン、世界中のムスリムのためのオープンデータセット。イスラムアプリの無限の革新を促します。",
+    innaLillahiQuote: "「本当に私たちはアッラーのものであり、彼のもとに帰るのである。」",
     tryApp: "アプリを試す",
     viewGithub: "GitHubで見る",
     getApi: "APIを取得",
@@ -235,6 +242,7 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
   },
   Turkish: {
     heroDesc: "Dünya genelindeki Müslümanlar için çok dilli dijital Kuran ve açık veri seti. Sınırsız İslami uygulama inovasyonuna ilham veriyor.",
+    innaLillahiQuote: "“Şüphesiz biz Allah’a aidiz ve şüphesiz O’na döneceğiz.”",
     tryApp: "Uygulamayı Dene",
     viewGithub: "GitHub'da Gör",
     getApi: "API Al",
@@ -268,6 +276,7 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
   },
   French: {
     heroDesc: "Coran numérique multilingue, base de données ouverte pour les musulmans du monde entier. Inspirer l'innovation sans limite.",
+    innaLillahiQuote: "« Certes, nous appartenons à Allah et c'est à Lui que nous retournerons. »",
     tryApp: "Essayer l'application",
     viewGithub: "Voir sur GitHub",
     getApi: "Obtenir l'API",
@@ -301,6 +310,7 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
   },
   Malay: {
     heroDesc: "Al-Quran digital pelbagai bahasa, set data terbuka untuk umat Islam sedunia. Menginspirasikan inovasi aplikasi Islam tanpa had.",
+    innaLillahiQuote: "“Sesungguhnya kami adalah kepunyaan Allah dan kepada-Nya jualah kami kembali.”",
     tryApp: "Cuba Aplikasi",
     viewGithub: "Lihat di GitHub",
     getApi: "Dapatkan API",

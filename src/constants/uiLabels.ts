@@ -29,8 +29,6 @@ export interface UILabels {
   languagesBreadcrumb: string;
   codeToggle: string;
   previewToggle: string;
-  copyJsonButton: string;
-  copiedStatus: string;
   charactersLabel: string;
   linesLabel: string;
   noFileSelected: string;
@@ -76,8 +74,6 @@ export const UI_LABELS: Record<AppLanguage, UILabels> = {
     languagesBreadcrumb: 'bahasa',
     codeToggle: 'Kode',
     previewToggle: 'Pratinjau',
-    copyJsonButton: 'Salin JSON',
-    copiedStatus: 'Tersalin!',
     charactersLabel: 'karakter',
     linesLabel: 'baris',
     noFileSelected: 'Pilih file JSON dari dropdown di atas untuk melihat isinya.',
@@ -109,8 +105,6 @@ export const UI_LABELS: Record<AppLanguage, UILabels> = {
     languagesBreadcrumb: 'languages',
     codeToggle: 'Code',
     previewToggle: 'Preview',
-    copyJsonButton: 'Copy JSON',
-    copiedStatus: 'Copied!',
     charactersLabel: 'characters',
     linesLabel: 'lines',
     noFileSelected: 'Select a JSON file from the dropdowns above to view its content.',
@@ -142,8 +136,6 @@ export const UI_LABELS: Record<AppLanguage, UILabels> = {
     languagesBreadcrumb: 'اللغات',
     codeToggle: 'كود',
     previewToggle: 'معاينة',
-    copyJsonButton: 'نسخ JSON',
-    copiedStatus: 'تم النسخ!',
     charactersLabel: 'حرف',
     linesLabel: 'سطر',
     noFileSelected: 'حدد ملف JSON من القائمة المنسدلة أعلاه لعرض محتواه.',
@@ -175,8 +167,6 @@ export const UI_LABELS: Record<AppLanguage, UILabels> = {
     languagesBreadcrumb: '语言',
     codeToggle: '代码',
     previewToggle: '预览',
-    copyJsonButton: '复制 JSON',
-    copiedStatus: '已复制！',
     charactersLabel: '字符',
     linesLabel: '行',
     noFileSelected: '请从上方下拉菜单中选择一个 JSON 文件以查看内容。',
@@ -208,8 +198,6 @@ export const UI_LABELS: Record<AppLanguage, UILabels> = {
     languagesBreadcrumb: 'idiomas',
     codeToggle: 'Código',
     previewToggle: 'Vista previa',
-    copyJsonButton: 'Copiar JSON',
-    copiedStatus: '¡Copiado!',
     charactersLabel: 'caracteres',
     linesLabel: 'líneas',
     noFileSelected: 'Seleccione un archivo JSON de los desplegables anteriores para ver su contenido.',
@@ -241,8 +229,6 @@ export const UI_LABELS: Record<AppLanguage, UILabels> = {
     languagesBreadcrumb: '言語',
     codeToggle: 'コード',
     previewToggle: 'プレビュー',
-    copyJsonButton: 'JSONをコピー',
-    copiedStatus: 'コピー完了！',
     charactersLabel: '文字',
     linesLabel: '行',
     noFileSelected: '上のドロップダウンからJSONファイルを選択して内容を表示します。',
@@ -274,8 +260,6 @@ export const UI_LABELS: Record<AppLanguage, UILabels> = {
     languagesBreadcrumb: 'diller',
     codeToggle: 'Kod',
     previewToggle: 'Önizleme',
-    copyJsonButton: "JSON'ı Kopyala",
-    copiedStatus: 'Kopyalandı!',
     charactersLabel: 'karakter',
     linesLabel: 'satır',
     noFileSelected: 'İçeriğini görüntülemek için yukarıdaki açılır menüden bir JSON dosyası seçin.',
@@ -307,8 +291,6 @@ export const UI_LABELS: Record<AppLanguage, UILabels> = {
     languagesBreadcrumb: 'langues',
     codeToggle: 'Code',
     previewToggle: 'Aperçu',
-    copyJsonButton: 'Copier le JSON',
-    copiedStatus: 'Copié !',
     charactersLabel: 'caractères',
     linesLabel: 'lignes',
     noFileSelected: 'Sélectionnez un fichier JSON dans les menus déroulants ci-dessus pour afficher son contenu.',
@@ -340,8 +322,6 @@ export const UI_LABELS: Record<AppLanguage, UILabels> = {
     languagesBreadcrumb: 'bahasa',
     codeToggle: 'Kod',
     previewToggle: 'Pratinjau',
-    copyJsonButton: 'Salin JSON',
-    copiedStatus: 'Tersalin!',
     charactersLabel: 'aksara',
     linesLabel: 'baris',
     noFileSelected: 'Pilih fail JSON daripada menu di atas untuk melihat kandungannya.',
