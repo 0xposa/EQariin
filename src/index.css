@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+@keyframes float-crescent {
+  0%, 100% {
+    transform: translateY(0px) rotate(-12deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(-10deg);
+  }
+}
+
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: 0.10;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.18);
+  }
+}
+
+.animate-float-crescent {
+  animation: float-crescent 7s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: star-twinkle 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-crescent,
+  .animate-twinkle {
+    animation: none !important;
+  }
+}

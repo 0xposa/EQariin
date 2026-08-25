@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { FolderOpen, FileJson, ChevronRight, Download, ChevronDown, Code, Eye, Check } from 'lucide-react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -276,9 +277,41 @@ export default function App() {
     return Array.from(set).sort();
   }, [files]);
 
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+
+  const paramFolder = searchParams.get('folder') || searchParams.get('lang');
+  const paramFile = searchParams.get('file') || searchParams.get('surah');
+  const paramVerseStr = searchParams.get('verse') || searchParams.get('ayat') || (location.hash.startsWith('#verse-') ? location.hash.replace('#verse-', '') : null);
+  const paramVerse = paramVerseStr ? parseInt(paramVerseStr, 10) : null;
+
   // Selected folder and file states
-  const [selectedFolder, setSelectedFolder] = useState<string>(() => folders[0] || 'Bahasa Indonesia');
+  const [selectedFolder, setSelectedFolder] = useState<string>(() => {
+    if (paramFolder) {
+      const matched = folders.find((f) => f.toLowerCase() === paramFolder.toLowerCase());
+      if (matched) return matched;
+    }
+    return folders[0] || 'Bahasa Indonesia';
+  });
+
   const [viewMode, setViewMode] = useState<'code' | 'preview'>('preview');
+
+  // If search params change
+  useEffect(() => {
+    if (paramFolder) {
+      const matched = folders.find((f) => f.toLowerCase() === paramFolder.toLowerCase());
+      if (matched && matched !== selectedFolder) {
+        setSelectedFolder(matched);
+      }
+    }
+  }, [paramFolder, folders]);
+
+  // Ensure viewMode is 'preview' when verse param is present
+  useEffect(() => {
+    if (paramVerse) {
+      setViewMode('preview');
+    }
+  }, [paramVerse]);
   
   // Get list of files in the selected folder, sorted by surah_number in JSON
   const folderFiles = useMemo(() => {
@@ -301,8 +334,16 @@ export default function App() {
   }, [files, selectedFolder]);
 
   const [selectedFileName, setSelectedFileName] = useState<string>(() => {
-    const indonesiaFiles = files.filter((f) => f.folder === (folders[0] || 'Bahasa Indonesia'));
-    const sorted = [...indonesiaFiles].sort((a, b) => {
+    if (paramFile) {
+      const matchedFile = files.find((f) => 
+        (paramFolder ? f.folder.toLowerCase() === paramFolder.toLowerCase() : true) &&
+        (f.fileName.toLowerCase() === paramFile.toLowerCase() || f.fileName.toLowerCase().includes(paramFile.toLowerCase()))
+      );
+      if (matchedFile) return matchedFile.fileName;
+    }
+
+    const currentFolderFiles = files.filter((f) => f.folder === (paramFolder || folders[0] || 'Bahasa Indonesia'));
+    const sorted = [...currentFolderFiles].sort((a, b) => {
       let numA = 999;
       let numB = 999;
       try {
@@ -317,6 +358,17 @@ export default function App() {
     });
     return sorted[0] ? sorted[0].fileName : '';
   });
+
+  useEffect(() => {
+    if (paramFile) {
+      const matchedFile = folderFiles.find((f) =>
+        f.fileName.toLowerCase() === paramFile.toLowerCase() || f.fileName.toLowerCase().includes(paramFile.toLowerCase())
+      );
+      if (matchedFile && matchedFile.fileName !== selectedFileName) {
+        setSelectedFileName(matchedFile.fileName);
+      }
+    }
+  }, [paramFile, folderFiles]);
 
   // Active file content object
   const activeFile = useMemo(() => {
@@ -455,7 +507,7 @@ export default function App() {
                   onClick={() => setViewMode('preview')}
                   className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded transition-all cursor-pointer ${
                     viewMode === 'preview'
-                      ? 'bg-emerald-700 text-white shadow-2xs'
+                      ? 'bg-emerald-800 text-white shadow-2xs'
                       : 'text-stone-600 hover:text-stone-900'
                   }`}
                 >
@@ -474,7 +526,7 @@ export default function App() {
               )}
               <button
                 onClick={handleDownloadLanguages}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-xs rounded-lg transition-colors shadow-2xs cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-medium text-xs rounded-lg transition-colors shadow-2xs cursor-pointer active:scale-95"
                 title={labels.downloadLanguagesButton}
               >
                 <Download className="w-3.5 h-3.5" />
@@ -488,7 +540,13 @@ export default function App() {
             viewMode === 'code' ? (
               <JsonSyntaxViewer jsonString={formattedContent} />
             ) : (
-              <QuranPreview jsonString={formattedContent} appLanguage={appLanguage} />
+              <QuranPreview
+                jsonString={formattedContent}
+                appLanguage={appLanguage}
+                folder={selectedFolder}
+                fileName={activeFile?.fileName || selectedFileName}
+                initialVerse={paramVerse}
+              />
             )
           ) : (
             <div className="flex-1 min-h-0 flex flex-col items-center justify-center text-stone-500 text-center space-y-2 bg-[#1e1e1e] p-5">

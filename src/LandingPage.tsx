@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import { UI_LABELS } from './constants/uiLabels';
 import { LANDING_TRANSLATIONS } from './constants/landingTranslations';
 import { WORLD_LANGUAGES, LanguageRegion } from './constants/worldLanguages';
+import CelestialBackground from './components/CelestialBackground';
 
 const TRANSLATIONS = [
   { lang: "Bahasa Indonesia", text: "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang." },
@@ -119,8 +120,11 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-stone-800 font-sans selection:bg-emerald-900 selection:text-emerald-50">
+    <div className="relative min-h-screen bg-[#FDFBF7] text-stone-800 font-sans selection:bg-emerald-900 selection:text-emerald-50 overflow-x-hidden">
       
+      {/* Background Decorative Celestial Layer (Crescent Moon & Stars) */}
+      <CelestialBackground />
+
       {/* Navbar */}
       <Navbar />
 
@@ -286,7 +290,7 @@ export default function LandingPage() {
           
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a 
-              href="https://wa.me/6282197362062?text=Halo%20Tim%20Muslim%20Plus%2C%20saya%20tertarik%20untuk%20membahas%20peluang%20investasi%20%2F%20kemitraan%20strategis." 
+              href="https://wa.me/6282197362062?text=Hello%20Muslim%20Plus%20Team%2C%20I%20am%20interested%20in%20discussing%20investment%20%2F%20strategic%20partnership%20opportunities." 
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2.5 bg-emerald-900 hover:bg-emerald-950 text-white px-8 py-4 rounded-full font-semibold text-sm transition-all shadow-lg shadow-emerald-950/20 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
@@ -515,7 +519,7 @@ export default function LandingPage() {
       </motion.section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-stone-200 py-16 px-6">
+      <footer className="relative z-10 bg-white border-t border-stone-200 py-16 px-6">
         <motion.div 
           variants={containerVariants}
           initial="hidden"
