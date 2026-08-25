@@ -37,16 +37,27 @@ export function QuranPreview({
     }
   }, [jsonString]);
 
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollToVerse = (num: number) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const el = document.getElementById(`verse-${num}`);
+    if (el) {
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const offset = elRect.top - containerRect.top + container.scrollTop - 24;
+      container.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
+    }
+  };
+
   // Auto-scroll and select if initialVerse is provided
   useEffect(() => {
     if (initialVerse) {
       setSelectedVerse(initialVerse);
       const timer = setTimeout(() => {
-        const el = document.getElementById(`verse-${initialVerse}`);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 300);
+        scrollToVerse(initialVerse);
+      }, 350);
       return () => clearTimeout(timer);
     }
   }, [initialVerse, data]);
@@ -59,10 +70,7 @@ export function QuranPreview({
         const num = parseInt(hash.replace('#verse-', ''), 10);
         if (!isNaN(num)) {
           setSelectedVerse(num);
-          const el = document.getElementById(`verse-${num}`);
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
+          setTimeout(() => scrollToVerse(num), 100);
         }
       }
     };
@@ -148,7 +156,10 @@ export function QuranPreview({
   const badgeHeader = labels.surahHeader.replace('#', String(surahNum ?? '—'));
 
   return (
-    <div className="relative flex-1 min-h-0 overflow-y-auto overscroll-contain bg-white text-stone-900 font-sans p-4 sm:p-8">
+    <div
+      ref={containerRef}
+      className="relative flex-1 min-h-0 overflow-y-auto overscroll-contain bg-white text-stone-900 font-sans p-4 sm:p-8"
+    >
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 bg-stone-900/95 text-white text-xs sm:text-sm font-medium rounded-full shadow-2xl flex items-center gap-2 border border-stone-700 animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-none">
@@ -190,10 +201,22 @@ export function QuranPreview({
           )}
 
           <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-stone-500 font-medium">
-            <span>{formattedSurahNum}</span>
-            <span>•</span>
-            <span>{formattedPlace}</span>
-            <span>•</span>
+            {surahNum !== undefined && surahNum !== null && (
+              <>
+                <span>
+                  {typeof surahNum === 'number' ? `Surah ${surahNum}` : surahNum}
+                </span>
+                {(revPlace || verseCount || versesList.length > 0) && <span>•</span>}
+              </>
+            )}
+
+            {revPlace && (
+              <>
+                <span>{revPlace}</span>
+                {(verseCount || versesList.length > 0) && <span>•</span>}
+              </>
+            )}
+
             <span>
               {verseCount ?? versesList.length} {labels.ayatLabel}
             </span>

@@ -172,8 +172,8 @@ function BreadcrumbDropdown({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-medium transition-all cursor-pointer select-none ${accentClass} ${
-          isOpen ? 'ring-2 ring-emerald-500/30 border-emerald-500 shadow-xs' : 'shadow-2xs'
+        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all duration-150 cursor-pointer select-none ${accentClass} ${
+          isOpen ? 'ring-2 ring-emerald-600/20 border-emerald-600 shadow-xs scale-[1.01]' : 'shadow-2xs hover:shadow-xs'
         }`}
       >
         {icon}
@@ -455,86 +455,81 @@ export default function App() {
       {/* Shared Navbar (Identical to Landing Page) */}
       <Navbar />
 
-      {/* Main Content Area */}
-      <main className="flex-1 min-h-0 p-3 sm:p-4 md:p-6 flex flex-col z-30 max-w-[1920px] w-full mx-auto">
-        
-        {/* Single Combined Fixed Container for Dropdowns + Code Box */}
-        <div className="w-full flex-1 min-h-0 bg-white border border-stone-200 rounded-xl shadow-2xs flex flex-col overflow-hidden">
-          
-          {/* Header Bar: Breadcrumb Dropdowns + File Metadata + Download Button */}
-          <div className="bg-white border-b border-stone-200 px-4 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-3 shrink-0 z-20">
-            <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-stone-600">
-              <span className="text-stone-400 font-medium select-none">{labels.languagesBreadcrumb}</span>
-              <ChevronRight className="w-3.5 h-3.5 text-stone-300 shrink-0" />
+      {/* Sub Topbar (Modern Breadcrumb Toolbar) */}
+      <div className="w-full bg-white/95 backdrop-blur-md border-b border-stone-200/80 shadow-2xs z-30 shrink-0">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2.5 text-xs text-stone-600">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 select-none pl-0.5">
+              {labels.languagesBreadcrumb}
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-stone-300 shrink-0" />
 
-              {/* Folder Inline Dropdown */}
-              <BreadcrumbDropdown
-                value={selectedFolder}
-                options={folderOptions}
-                onSelect={handleSelectFolder}
-                icon={<FolderOpen className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
-                accentClass="bg-emerald-50 text-emerald-900 border-emerald-200/90 hover:bg-emerald-100/90"
-              />
+            {/* Folder Inline Dropdown */}
+            <BreadcrumbDropdown
+              value={selectedFolder}
+              options={folderOptions}
+              onSelect={handleSelectFolder}
+              icon={<FolderOpen className="w-3.5 h-3.5 text-emerald-700 shrink-0" />}
+              accentClass="bg-emerald-50/70 text-emerald-950 border-emerald-200/80 hover:bg-emerald-100/80"
+            />
 
-              <ChevronRight className="w-3.5 h-3.5 text-stone-300 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-stone-300 shrink-0" />
 
-              {/* File Inline Dropdown */}
-              <BreadcrumbDropdown
-                value={activeFile?.fileName || selectedFileName}
-                options={fileOptions}
-                onSelect={setSelectedFileName}
-                icon={<FileJson className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
-                accentClass="bg-stone-100 text-stone-900 border-stone-200/90 hover:bg-stone-200/90"
-                isMono={true}
-              />
+            {/* File Inline Dropdown */}
+            <BreadcrumbDropdown
+              value={activeFile?.fileName || selectedFileName}
+              options={fileOptions}
+              onSelect={setSelectedFileName}
+              icon={<FileJson className="w-3.5 h-3.5 text-amber-600 shrink-0" />}
+              accentClass="bg-stone-50 text-stone-800 border-stone-200/80 hover:bg-stone-100/80"
+              isMono={true}
+            />
 
-              {/* View Mode Toggle Switch */}
-              <div className="inline-flex items-center p-0.5 bg-stone-100/90 border border-stone-200/90 rounded-md ml-1 font-sans shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('code')}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded transition-all cursor-pointer ${
-                    viewMode === 'code'
-                      ? 'bg-stone-900 text-white shadow-2xs'
-                      : 'text-stone-600 hover:text-stone-900'
-                  }`}
-                >
-                  <Code className="w-3.5 h-3.5" />
-                  <span>{labels.codeToggle}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('preview')}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded transition-all cursor-pointer ${
-                    viewMode === 'preview'
-                      ? 'bg-emerald-800 text-white shadow-2xs'
-                      : 'text-stone-600 hover:text-stone-900'
-                  }`}
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>{labels.previewToggle}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Right section: metadata & Download button (replacing Salin JSON) */}
-            <div className="flex items-center space-x-3">
-              {activeFile && (
-                <span className="text-[11px] text-stone-400 font-mono hidden sm:inline-block">
-                  {formattedContent.length} {labels.charactersLabel} | {formattedContent.split('\n').length} {labels.linesLabel}
-                </span>
-              )}
+            {/* View Mode Segmented Pill */}
+            <div className="inline-flex items-center p-1 bg-stone-100/80 border border-stone-200/70 rounded-lg ml-1 font-sans shrink-0 gap-0.5">
               <button
-                onClick={handleDownloadLanguages}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-medium text-xs rounded-lg transition-colors shadow-2xs cursor-pointer active:scale-95"
-                title={labels.downloadLanguagesButton}
+                type="button"
+                onClick={() => setViewMode('code')}
+                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md transition-all duration-150 cursor-pointer ${
+                  viewMode === 'code'
+                    ? 'bg-stone-900 text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-950 hover:bg-stone-200/50'
+                }`}
               >
-                <Download className="w-3.5 h-3.5" />
-                <span>{labels.downloadLanguagesButton}</span>
+                <Code className="w-3.5 h-3.5" />
+                <span>{labels.codeToggle}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('preview')}
+                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md transition-all duration-150 cursor-pointer ${
+                  viewMode === 'preview'
+                    ? 'bg-emerald-800 text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-950 hover:bg-stone-200/50'
+                }`}
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>{labels.previewToggle}</span>
               </button>
             </div>
           </div>
 
+          {/* Right section: metadata badge */}
+          {activeFile && (
+            <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-stone-100/80 border border-stone-200/60 text-[11px] font-mono text-stone-500">
+              <span>{formattedContent.length} {labels.charactersLabel}</span>
+              <span className="text-stone-300">•</span>
+              <span>{formattedContent.split('\n').length} {labels.linesLabel}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <main className="flex-1 min-h-0 p-3 sm:p-4 md:p-6 flex flex-col z-20 max-w-[1920px] w-full mx-auto">
+        
+        {/* Content Box (Code / Preview) */}
+        <div className="w-full flex-1 min-h-0 bg-white border border-stone-200 rounded-xl shadow-2xs flex flex-col overflow-hidden">
           {/* Viewer Content Body (Only area that scrolls) */}
           {activeFile ? (
             viewMode === 'code' ? (
@@ -554,14 +549,6 @@ export default function App() {
               <p className="text-sm">{labels.noFileSelected}</p>
             </div>
           )}
-
-          {/* Viewer Footer Bar */}
-          <div className="bg-stone-50 border-t border-stone-200 px-4 sm:px-5 py-2.5 text-xs text-stone-500 flex items-center justify-between shrink-0">
-            <span>Status: <strong className="text-emerald-700 font-medium">{labels.statusConnected}</strong></span>
-            <span className="font-mono text-[11px] text-stone-400 truncate max-w-[200px] sm:max-w-none ml-2">
-              {activeFile ? activeFile.fullPath : ''}
-            </span>
-          </div>
 
         </div>
 
