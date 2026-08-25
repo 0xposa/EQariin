@@ -7,6 +7,7 @@ import {
   formatRevelationPlace,
 } from '../constants/uiLabels';
 import { SurahJsonObject, VerseItem } from '../types';
+import { toSurahSlug } from '../utils/slugUtils';
 
 interface QuranPreviewProps {
   jsonString: string;
@@ -88,10 +89,11 @@ export function QuranPreview({
   const versesList: VerseItem[] = data?.verses ?? data?.ayat ?? [];
 
   const handleShareVerse = async (verseNum: number) => {
-    // Construct clean and beautiful share URL, using exact surah_name or exact fileName
+    // Construct clean and URL-safe share URL using slug, e.g. /app?ayat=al-anam-105
     const url = new URL(window.location.origin + '/app');
-    const exactName = surahName || (fileName ? fileName.replace(/\.json$/i, '') : (surahNum ? String(surahNum) : '1'));
-    url.searchParams.set('ayat', `${exactName}-${verseNum}`);
+    const rawIdentifier = surahName || (fileName ? fileName.replace(/\.json$/i, '') : (surahNum ? String(surahNum) : '1'));
+    const surahSlug = toSurahSlug(rawIdentifier);
+    url.searchParams.set('ayat', `${surahSlug}-${verseNum}`);
     if (folder && folder.toLowerCase() !== 'arabic' && folder.toLowerCase() !== 'bahasa indonesia') {
       url.searchParams.set('folder', folder);
     }
@@ -118,10 +120,11 @@ export function QuranPreview({
   };
 
   const handleShareSurah = async () => {
-    // Construct clean and beautiful share URL for surah, using exact surah_name or exact fileName
+    // Construct clean and URL-safe share URL for surah using slug, e.g. /app?surah=al-anam
     const url = new URL(window.location.origin + '/app');
-    const exactName = surahName || (fileName ? fileName.replace(/\.json$/i, '') : (surahNum ? String(surahNum) : '1'));
-    url.searchParams.set('surah', exactName);
+    const rawIdentifier = surahName || (fileName ? fileName.replace(/\.json$/i, '') : (surahNum ? String(surahNum) : '1'));
+    const surahSlug = toSurahSlug(rawIdentifier);
+    url.searchParams.set('surah', surahSlug);
     if (folder && folder.toLowerCase() !== 'arabic' && folder.toLowerCase() !== 'bahasa indonesia') {
       url.searchParams.set('folder', folder);
     }

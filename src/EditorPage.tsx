@@ -8,6 +8,7 @@ import { UI_LABELS } from './constants/uiLabels';
 import { useLanguage } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import { QuranPreview } from './components/QuranPreview';
+import { toSurahSlug, matchesSurahSlug } from './utils/slugUtils';
 
 // Dynamically discover all JSON files inside /languages
 const rawModules = import.meta.glob(['/languages/**/*.json', './languages/**/*.json'], {
@@ -323,13 +324,14 @@ export default function App() {
 
   const [viewMode, setViewMode] = useState<'code' | 'preview'>('preview');
 
-  // Helper to find matching file by name or number
+  // Helper to find matching file by name, slug, or surah number
   const findMatchingSurahFile = (fileList: FileInfo[], identifier: string | null): FileInfo | undefined => {
     if (!identifier) return undefined;
+    const targetSlug = toSurahSlug(identifier);
     const cleanId = identifier.replace(/\.json$/i, '').trim().toLowerCase();
     const normalizedId = cleanId.replace(/[^a-z0-9]/g, '');
 
-    // 1. Match by surah_number if numeric
+    // 1. Match by surah_number if numeric (e.g. "6" or 6)
     const numId = parseInt(identifier, 10);
     if (!isNaN(numId) && numId > 0 && numId <= 114) {
       const foundByNum = fileList.find((f) => {
@@ -343,17 +345,33 @@ export default function App() {
       if (foundByNum) return foundByNum;
     }
 
-    // 2. Exact match without extension
+    // 2. Match by URL-safe slug on fileName (e.g. "al-anam" matches "Al-An'am.json")
+    const matchByFileSlug = fileList.find((f) => matchesSurahSlug(f.fileName, targetSlug));
+    if (matchByFileSlug) return matchByFileSlug;
+
+    // 3. Match by URL-safe slug on surah_name / nama_surah from JSON content
+    const matchByJsonName = fileList.find((f) => {
+      try {
+        const parsed = JSON.parse(f.content);
+        const name = parsed.surah_name || parsed.nama_surah;
+        return name && matchesSurahSlug(name, targetSlug);
+      } catch {
+        return false;
+      }
+    });
+    if (matchByJsonName) return matchByJsonName;
+
+    // 4. Exact match without extension
     const exact = fileList.find((f) => f.fileName.replace(/\.json$/i, '').toLowerCase() === cleanId);
     if (exact) return exact;
 
-    // 3. Normalized alphanumeric match (ignores apostrophes, hyphens, spaces)
+    // 5. Normalized alphanumeric match (ignores apostrophes, hyphens, spaces)
     const normalized = fileList.find(
       (f) => f.fileName.replace(/\.json$/i, '').replace(/[^a-z0-9]/g, '').toLowerCase() === normalizedId
     );
     if (normalized) return normalized;
 
-    // 4. Substring search
+    // 6. Substring search fallback
     return fileList.find(
       (f) => f.fileName.toLowerCase().includes(cleanId) || cleanId.includes(f.fileName.replace(/\.json$/i, '').toLowerCase())
     );
