@@ -88,12 +88,13 @@ export function QuranPreview({
   const versesList: VerseItem[] = data?.verses ?? data?.ayat ?? [];
 
   const handleShareVerse = async (verseNum: number) => {
-    // Construct direct share URL pointing to this specific verse
+    // Construct clean and beautiful share URL, using exact surah_name or exact fileName
     const url = new URL(window.location.origin + '/app');
-    if (folder) url.searchParams.set('folder', folder);
-    if (fileName) url.searchParams.set('file', fileName);
-    url.searchParams.set('verse', String(verseNum));
-    url.hash = `verse-${verseNum}`;
+    const exactName = surahName || (fileName ? fileName.replace(/\.json$/i, '') : (surahNum ? String(surahNum) : '1'));
+    url.searchParams.set('ayat', `${exactName}-${verseNum}`);
+    if (folder && folder.toLowerCase() !== 'arabic' && folder.toLowerCase() !== 'bahasa indonesia') {
+      url.searchParams.set('folder', folder);
+    }
     const shareUrl = url.toString();
 
     // Directly copy link to clipboard without triggering any OS share pop-up
@@ -117,10 +118,13 @@ export function QuranPreview({
   };
 
   const handleShareSurah = async () => {
-    // Construct direct share URL pointing to this specific surah
+    // Construct clean and beautiful share URL for surah, using exact surah_name or exact fileName
     const url = new URL(window.location.origin + '/app');
-    if (folder) url.searchParams.set('folder', folder);
-    if (fileName) url.searchParams.set('file', fileName);
+    const exactName = surahName || (fileName ? fileName.replace(/\.json$/i, '') : (surahNum ? String(surahNum) : '1'));
+    url.searchParams.set('surah', exactName);
+    if (folder && folder.toLowerCase() !== 'arabic' && folder.toLowerCase() !== 'bahasa indonesia') {
+      url.searchParams.set('folder', folder);
+    }
     const shareUrl = url.toString();
 
     // Directly copy link to clipboard without triggering any OS share pop-up

@@ -280,10 +280,37 @@ export default function App() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
 
+  const rawAyatParam = searchParams.get('ayat') || searchParams.get('verse');
+  const rawSurahParam = searchParams.get('surah') || searchParams.get('file');
   const paramFolder = searchParams.get('folder') || searchParams.get('lang');
-  const paramFile = searchParams.get('file') || searchParams.get('surah');
-  const paramVerseStr = searchParams.get('verse') || searchParams.get('ayat') || (location.hash.startsWith('#verse-') ? location.hash.replace('#verse-', '') : null);
-  const paramVerse = paramVerseStr ? parseInt(paramVerseStr, 10) : null;
+
+  // Helper to parse ayat parameter (e.g., "Al-Anam-105" or "6-105" or "Al-Fatihah-1")
+  const { parsedSurah, parsedVerse } = useMemo(() => {
+    let s: string | null = rawSurahParam || null;
+    let v: number | null = null;
+
+    if (rawAyatParam) {
+      // Check for SurahName-VerseNum pattern (e.g. Al-Anam-105 or 6-105)
+      const match = rawAyatParam.match(/^(.+)-(\d+)$/);
+      if (match) {
+        s = match[1];
+        v = parseInt(match[2], 10);
+      } else if (/^\d+$/.test(rawAyatParam)) {
+        v = parseInt(rawAyatParam, 10);
+      } else {
+        s = rawAyatParam;
+      }
+    }
+
+    if (!v && location.hash.startsWith('#verse-')) {
+      const num = parseInt(location.hash.replace('#verse-', ''), 10);
+      if (!isNaN(num)) v = num;
+    }
+
+    return { parsedSurah: s, parsedVerse: v };
+  }, [rawAyatParam, rawSurahParam, location.hash]);
+
+  const paramVerse = parsedVerse;
 
   // Selected folder and file states
   const [selectedFolder, setSelectedFolder] = useState<string>(() => {
@@ -295,6 +322,42 @@ export default function App() {
   });
 
   const [viewMode, setViewMode] = useState<'code' | 'preview'>('preview');
+
+  // Helper to find matching file by name or number
+  const findMatchingSurahFile = (fileList: FileInfo[], identifier: string | null): FileInfo | undefined => {
+    if (!identifier) return undefined;
+    const cleanId = identifier.replace(/\.json$/i, '').trim().toLowerCase();
+    const normalizedId = cleanId.replace(/[^a-z0-9]/g, '');
+
+    // 1. Match by surah_number if numeric
+    const numId = parseInt(identifier, 10);
+    if (!isNaN(numId) && numId > 0 && numId <= 114) {
+      const foundByNum = fileList.find((f) => {
+        try {
+          const parsed = JSON.parse(f.content);
+          return parsed.surah_number === numId || parsed.nomor_surah === numId;
+        } catch {
+          return false;
+        }
+      });
+      if (foundByNum) return foundByNum;
+    }
+
+    // 2. Exact match without extension
+    const exact = fileList.find((f) => f.fileName.replace(/\.json$/i, '').toLowerCase() === cleanId);
+    if (exact) return exact;
+
+    // 3. Normalized alphanumeric match (ignores apostrophes, hyphens, spaces)
+    const normalized = fileList.find(
+      (f) => f.fileName.replace(/\.json$/i, '').replace(/[^a-z0-9]/g, '').toLowerCase() === normalizedId
+    );
+    if (normalized) return normalized;
+
+    // 4. Substring search
+    return fileList.find(
+      (f) => f.fileName.toLowerCase().includes(cleanId) || cleanId.includes(f.fileName.replace(/\.json$/i, '').toLowerCase())
+    );
+  };
 
   // If search params change
   useEffect(() => {
@@ -334,10 +397,10 @@ export default function App() {
   }, [files, selectedFolder]);
 
   const [selectedFileName, setSelectedFileName] = useState<string>(() => {
-    if (paramFile) {
-      const matchedFile = files.find((f) => 
-        (paramFolder ? f.folder.toLowerCase() === paramFolder.toLowerCase() : true) &&
-        (f.fileName.toLowerCase() === paramFile.toLowerCase() || f.fileName.toLowerCase().includes(paramFile.toLowerCase()))
+    if (parsedSurah) {
+      const matchedFile = findMatchingSurahFile(
+        files.filter((f) => (paramFolder ? f.folder.toLowerCase() === paramFolder.toLowerCase() : true)),
+        parsedSurah
       );
       if (matchedFile) return matchedFile.fileName;
     }
@@ -360,15 +423,13 @@ export default function App() {
   });
 
   useEffect(() => {
-    if (paramFile) {
-      const matchedFile = folderFiles.find((f) =>
-        f.fileName.toLowerCase() === paramFile.toLowerCase() || f.fileName.toLowerCase().includes(paramFile.toLowerCase())
-      );
+    if (parsedSurah) {
+      const matchedFile = findMatchingSurahFile(folderFiles, parsedSurah);
       if (matchedFile && matchedFile.fileName !== selectedFileName) {
         setSelectedFileName(matchedFile.fileName);
       }
     }
-  }, [paramFile, folderFiles]);
+  }, [parsedSurah, folderFiles]);
 
   // Active file content object
   const activeFile = useMemo(() => {
