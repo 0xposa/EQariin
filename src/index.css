@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
+}
+
 @keyframes float-crescent {
   0%, 100% {
     transform: translateY(0px) rotate(-12deg);

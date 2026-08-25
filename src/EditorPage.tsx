@@ -451,7 +451,7 @@ export default function App() {
   }, [activeFile]);
 
   return (
-    <div className="h-screen bg-stone-50 text-slate-800 flex flex-col font-sans overflow-hidden">
+    <div className="fixed inset-0 h-[100dvh] w-full bg-stone-50 text-slate-800 flex flex-col font-sans overflow-hidden overscroll-none select-none">
       {/* Shared Navbar (Identical to Landing Page) */}
       <Navbar />
 
