@@ -278,7 +278,7 @@ export default function App() {
 
   // Selected folder and file states
   const [selectedFolder, setSelectedFolder] = useState<string>(() => folders[0] || 'Bahasa Indonesia');
-  const [viewMode, setViewMode] = useState<'code' | 'preview'>('code');
+  const [viewMode, setViewMode] = useState<'code' | 'preview'>('preview');
   
   // Get list of files in the selected folder, sorted by surah_number in JSON
   const folderFiles = useMemo(() => {
