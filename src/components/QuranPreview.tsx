@@ -79,7 +79,7 @@ export function QuranPreview({
   const verseCount = data?.verse_count ?? data?.jumlah_ayat;
   const versesList: VerseItem[] = data?.verses ?? data?.ayat ?? [];
 
-  const handleShareVerse = async (verseNum: number, verseText: string) => {
+  const handleShareVerse = async (verseNum: number) => {
     // Construct direct share URL pointing to this specific verse
     const url = new URL(window.location.origin + '/app');
     if (folder) url.searchParams.set('folder', folder);
@@ -88,96 +88,49 @@ export function QuranPreview({
     url.hash = `verse-${verseNum}`;
     const shareUrl = url.toString();
 
-    const currentSurah = surahName || (surahNum ? `Surah ${surahNum}` : 'Surah');
-    const shareTitle = `${currentSurah} - ${labels.ayatLabel} ${verseNum}`;
-    const shareBody = `Muslim Plus - ${currentSurah} (${labels.ayatLabel} ${verseNum})\n"${verseText}"\n\n${shareUrl}`;
-
-    let sharedDirectly = false;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: shareTitle,
-          text: `Muslim Plus - ${currentSurah} (${labels.ayatLabel} ${verseNum})\n"${verseText}"\n`,
-          url: shareUrl,
-        });
-        sharedDirectly = true;
-      } catch (err: any) {
-        if (err?.name === 'AbortError') {
-          return;
-        }
-      }
-    }
-
-    if (!sharedDirectly) {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-      } catch {
-        const textarea = document.createElement('textarea');
-        textarea.value = shareUrl;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
+    // Directly copy link to clipboard without triggering any OS share pop-up
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = shareUrl;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
     }
 
     setCopiedVerse(verseNum);
     setTimeout(() => setCopiedVerse(null), 2500);
 
-    const feedbackText = sharedDirectly
-      ? (appLanguage === 'English' ? 'Verse shared successfully!' : 'Ayat berhasil dibagikan!')
-      : (appLanguage === 'English' ? 'Verse link copied to clipboard!' : 'Tautan ayat berhasil disalin!');
+    const feedbackText = appLanguage === 'English' ? 'Verse link copied!' : 'Tautan ayat berhasil disalin!';
     setToastMessage(feedbackText);
     setTimeout(() => setToastMessage(null), 2500);
   };
 
   const handleShareSurah = async () => {
+    // Construct direct share URL pointing to this specific surah
     const url = new URL(window.location.origin + '/app');
     if (folder) url.searchParams.set('folder', folder);
     if (fileName) url.searchParams.set('file', fileName);
     const shareUrl = url.toString();
 
-    const currentSurah = surahName || (surahNum ? `Surah ${surahNum}` : 'Surah');
-    const shareTitle = `${currentSurah} - Muslim Plus`;
-    const shareBody = `Baca ${currentSurah} (${surahMeaning ? surahMeaning + ', ' : ''}${verseCount ?? versesList.length} ${labels.ayatLabel}) di Muslim Plus:\n${shareUrl}`;
-
-    let sharedDirectly = false;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: shareTitle,
-          text: shareBody,
-          url: shareUrl,
-        });
-        sharedDirectly = true;
-      } catch (err: any) {
-        if (err?.name === 'AbortError') {
-          return;
-        }
-      }
-    }
-
-    if (!sharedDirectly) {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-      } catch {
-        const textarea = document.createElement('textarea');
-        textarea.value = shareUrl;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
+    // Directly copy link to clipboard without triggering any OS share pop-up
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = shareUrl;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
     }
 
     setCopiedSurah(true);
     setTimeout(() => setCopiedSurah(false), 2500);
 
-    const feedbackText = sharedDirectly
-      ? (appLanguage === 'English' ? 'Surah shared successfully!' : 'Surah berhasil dibagikan!')
-      : (appLanguage === 'English' ? 'Surah link copied to clipboard!' : 'Tautan surah berhasil disalin!');
+    const feedbackText = appLanguage === 'English' ? 'Surah link copied!' : 'Tautan surah berhasil disalin!';
     setToastMessage(feedbackText);
     setTimeout(() => setToastMessage(null), 2500);
   };
@@ -263,7 +216,7 @@ export function QuranPreview({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleShareVerse(verseNum, verseText);
+                      handleShareVerse(verseNum);
                     }}
                     aria-label={`Bagikan Ayat ${verseNum}`}
                     title="Bagikan tautan ayat ini"
