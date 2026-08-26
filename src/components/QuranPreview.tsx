@@ -15,6 +15,8 @@ interface QuranPreviewProps {
   folder?: string;
   fileName?: string;
   initialVerse?: number | null;
+  activeVerse?: number | null;
+  onVerseChange?: (verseNum: number | null) => void;
 }
 
 export function QuranPreview({
@@ -23,9 +25,20 @@ export function QuranPreview({
   folder = '',
   fileName = '',
   initialVerse = null,
+  activeVerse,
+  onVerseChange,
 }: QuranPreviewProps) {
   const labels = UI_LABELS[appLanguage] || UI_LABELS['Bahasa Indonesia'];
-  const [selectedVerse, setSelectedVerse] = useState<number | null>(initialVerse);
+  const [localSelectedVerse, setLocalSelectedVerse] = useState<number | null>(initialVerse);
+  const selectedVerse = activeVerse !== undefined ? activeVerse : localSelectedVerse;
+  
+  const handleSelectVerse = (verseNum: number | null) => {
+    setLocalSelectedVerse(verseNum);
+    if (onVerseChange) {
+      onVerseChange(verseNum);
+    }
+  };
+
   const [copiedVerse, setCopiedVerse] = useState<number | null>(null);
   const [copiedSurah, setCopiedSurah] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -52,41 +65,47 @@ export function QuranPreview({
     }
   };
 
-  // Auto-scroll and select if initialVerse is provided
-  useEffect(() => {
-    if (initialVerse) {
-      setSelectedVerse(initialVerse);
-      const timer = setTimeout(() => {
-        scrollToVerse(initialVerse);
-      }, 350);
-      return () => clearTimeout(timer);
-    }
-  }, [initialVerse, data]);
-
-  // Listen to hash changes (e.g., #verse-3)
-  useEffect(() => {
-    const handleHash = () => {
-      const hash = window.location.hash;
-      if (hash.startsWith('#verse-')) {
-        const num = parseInt(hash.replace('#verse-', ''), 10);
-        if (!isNaN(num)) {
-          setSelectedVerse(num);
-          setTimeout(() => scrollToVerse(num), 100);
-        }
-      }
-    };
-
-    handleHash();
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
-  }, []);
-
   const surahNum = data?.surah_number ?? data?.nomor_surah;
   const surahName = data?.surah_name ?? data?.nama_surah;
   const surahMeaning = data?.surah_meaning ?? data?.arti_nama_surah;
   const revPlace = data?.revelation_place ?? data?.tempat_turun;
   const verseCount = data?.verse_count ?? data?.jumlah_ayat;
   const versesList: VerseItem[] = data?.verses ?? data?.ayat ?? [];
+
+  // Track the current surah number/identifier to distinguish between:
+  // 1. Changing Surah -> reset scroll to top
+  // 2. Changing Language on same Surah -> keep selected verse and scroll to it
+  const prevSurahKeyRef = React.useRef<string | null>(null);
+
+  useEffect(() => {
+    const currentSurahKey = surahNum ? `surah-${surahNum}` : (surahName || fileName || '');
+    
+    if (initialVerse) {
+      handleSelectVerse(initialVerse);
+      const timer = setTimeout(() => scrollToVerse(initialVerse), 300);
+      prevSurahKeyRef.current = currentSurahKey;
+      return () => clearTimeout(timer);
+    }
+
+    if (selectedVerse) {
+      // Re-scroll to the selected verse when language/data changes
+      const timer1 = setTimeout(() => scrollToVerse(selectedVerse), 100);
+      const timer2 = setTimeout(() => scrollToVerse(selectedVerse), 300);
+      prevSurahKeyRef.current = currentSurahKey;
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
+    } else {
+      // If no verse is selected, and we changed to a different Surah, scroll to top
+      if (currentSurahKey && prevSurahKeyRef.current && prevSurahKeyRef.current !== currentSurahKey) {
+        if (containerRef.current) {
+          containerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+        }
+      }
+      prevSurahKeyRef.current = currentSurahKey;
+    }
+  }, [initialVerse, selectedVerse, data, surahNum, surahName, fileName]);
 
   const handleShareVerse = async (verseNum: number) => {
     // Construct clean and URL-safe share URL using slug, e.g. /app?ayat=al-anam-105
@@ -263,7 +282,7 @@ export function QuranPreview({
                 {/* Verse box with simple animation and dark green styling on click */}
                 <div
                   id={`verse-${verseNum}`}
-                  onClick={() => setSelectedVerse(isSelected ? null : verseNum)}
+                  onClick={() => handleSelectVerse(isSelected ? null : verseNum)}
                   className={`flex items-start gap-4 p-4 sm:p-5 rounded-xl cursor-pointer transition-all duration-300 ease-out active:scale-[0.995] ${
                     isSelected
                       ? 'bg-emerald-950/[0.03] border-2 border-emerald-800 shadow-md ring-4 ring-emerald-800/10 scale-[1.01] sm:scale-[1.015]'
