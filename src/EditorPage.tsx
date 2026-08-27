@@ -10,8 +10,6 @@ import {
   Code,
   Eye,
   Check,
-  Search,
-  X,
   BookOpen,
 } from 'lucide-react';
 import JSZip from 'jszip';
@@ -546,18 +544,6 @@ export default function App() {
     }
   }, [paramFolder, folders, selectedFolder]);
 
-  // Sync with global Navbar appLanguage change if a matching folder exists
-  const prevAppLangRef = React.useRef(appLanguage);
-  useEffect(() => {
-    if (prevAppLangRef.current !== appLanguage) {
-      prevAppLangRef.current = appLanguage;
-      const matched = folders.find((f) => f.toLowerCase() === appLanguage.toLowerCase());
-      if (matched && matched !== selectedFolder) {
-        handleSelectFolder(matched);
-      }
-    }
-  }, [appLanguage, folders, selectedFolder]);
-
   // Ensure viewMode is 'preview' when verse param is present
   useEffect(() => {
     if (paramVerse) {
@@ -638,118 +624,6 @@ export default function App() {
       icon: <FileJson className="w-4 h-4 text-amber-500 shrink-0" />,
     }));
   }, [surahList]);
-
-  // Search state & filter logic
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [selectedSearchIdx, setSelectedSearchIdx] = useState(0);
-  const searchContainerRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  const normalizeText = (text: string) => {
-    return text
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/['-`’‘]/g, '')
-      .trim();
-  };
-
-  const filteredSurahs = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return surahList;
-    }
-    const q = normalizeText(searchQuery);
-    const qNum = parseInt(searchQuery.trim(), 10);
-    const isNumberQuery = !isNaN(qNum);
-
-    return surahList.filter((s) => {
-      // 1. Match by exact or partial number
-      if (isNumberQuery && s.surahNumber === qNum) return true;
-      if (s.surahNumber.toString().includes(searchQuery.trim())) return true;
-
-      // 2. Match by surah name
-      const normName = normalizeText(s.surahName);
-      if (normName.includes(q)) return true;
-
-      // 3. Match by file name
-      const normFile = normalizeText(s.fileName);
-      if (normFile.includes(q)) return true;
-
-      // 4. Match by meaning / translation
-      if (s.surahMeaning && normalizeText(s.surahMeaning).includes(q)) return true;
-
-      // 5. Match by slug
-      if (toSurahSlug(s.surahName).includes(toSurahSlug(searchQuery))) return true;
-
-      return false;
-    });
-  }, [surahList, searchQuery]);
-
-  // Global shortcut to focus search input: '/' or 'Ctrl+K' / 'Cmd+K'
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-        setIsSearchOpen(true);
-      } else if (
-        e.key === '/' &&
-        document.activeElement !== searchInputRef.current &&
-        !(document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement)
-      ) {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-        setIsSearchOpen(true);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Click outside listener for search popup
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
-        setIsSearchOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setSelectedSearchIdx((prev) => (prev + 1) % (filteredSurahs.length || 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setSelectedSearchIdx((prev) => (prev - 1 + filteredSurahs.length) % (filteredSurahs.length || 1));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (filteredSurahs.length > 0) {
-        const targetSurah = filteredSurahs[selectedSearchIdx] || filteredSurahs[0];
-        handleSelectFile(targetSurah.fileName);
-        setIsSearchOpen(false);
-        setSearchQuery('');
-        searchInputRef.current?.blur();
-      }
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      setIsSearchOpen(false);
-      searchInputRef.current?.blur();
-    }
-  };
-
-  const searchPlaceholder = useMemo(() => {
-    if (appLanguage === 'Bahasa Indonesia' || appLanguage === 'Malay') {
-      return 'Cari Surah (nomor/nama)...';
-    }
-    if (appLanguage === 'Arabic') {
-      return 'ابحث عن سورة (رقم/اسم)...';
-    }
-    return 'Search Surah (e.g. 4, An-Nisa)...';
-  }, [appLanguage]);
 
   const handleDownloadLanguages = () => {
     const zip = new JSZip();
@@ -846,131 +720,11 @@ export default function App() {
             </div>
           </div>
 
-          {/* Right section: Quick Surah Search & Metadata */}
-          <div className="flex items-center gap-2.5 ml-auto sm:ml-0">
-            {/* Quick Surah Search Input */}
-            <div className="relative" ref={searchContainerRef}>
-              <div className="relative flex items-center">
-                <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 pointer-events-none" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setIsSearchOpen(true);
-                    setSelectedSearchIdx(0);
-                  }}
-                  onFocus={() => {
-                    setIsSearchOpen(true);
-                  }}
-                  onKeyDown={handleSearchKeyDown}
-                  placeholder={searchPlaceholder}
-                  className="pl-8 pr-12 py-1.5 w-44 sm:w-56 md:w-64 text-xs bg-stone-100/90 hover:bg-stone-100 focus:bg-white text-stone-800 placeholder-stone-400 rounded-lg border border-stone-200 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none transition-all shadow-2xs"
-                />
-                <div className="absolute right-2 flex items-center gap-1">
-                  {searchQuery ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSearchQuery('');
-                        setSelectedSearchIdx(0);
-                        searchInputRef.current?.focus();
-                      }}
-                      className="p-0.5 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-200 transition-colors"
-                      title="Clear search"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  ) : (
-                    <kbd className="hidden sm:inline-flex items-center text-[10px] font-mono text-stone-400 bg-stone-200/70 border border-stone-300/60 px-1 py-0.5 rounded select-none">
-                      /
-                    </kbd>
-                  )}
-                </div>
-              </div>
-
-              {/* Search Results Dropdown Menu */}
-              {isSearchOpen && (
-                <div className="absolute top-full right-0 mt-1.5 z-50 w-72 sm:w-84 bg-white border border-stone-200 rounded-xl shadow-xl py-1.5 max-h-80 overflow-y-auto overscroll-contain animate-in fade-in slide-in-from-top-1 duration-150">
-                  <div className="px-3 py-1.5 text-[10px] font-semibold text-stone-400 uppercase tracking-wider border-b border-stone-100 flex items-center justify-between">
-                    <span>
-                      Surah ({filteredSurahs.length})
-                    </span>
-                    <span className="text-[9px] font-normal normal-case text-stone-400">
-                      ↑↓ {appLanguage === 'Bahasa Indonesia' ? 'pilih' : 'navigate'}, ↵ {appLanguage === 'Bahasa Indonesia' ? 'buka' : 'select'}
-                    </span>
-                  </div>
-
-                  {filteredSurahs.length === 0 ? (
-                    <div className="px-4 py-5 text-xs text-stone-400 text-center italic">
-                      {appLanguage === 'Bahasa Indonesia'
-                        ? `Surah "${searchQuery}" tidak ditemukan`
-                        : `No Surah found for "${searchQuery}"`}
-                    </div>
-                  ) : (
-                    filteredSurahs.map((surah, idx) => {
-                      const isCurrent = activeFile?.fileName === surah.fileName;
-                      const isHighlighted = idx === selectedSearchIdx;
-                      return (
-                        <button
-                          key={surah.fileName}
-                          type="button"
-                          onClick={() => {
-                            handleSelectFile(surah.fileName);
-                            setIsSearchOpen(false);
-                            setSearchQuery('');
-                          }}
-                          onMouseEnter={() => setSelectedSearchIdx(idx)}
-                          className={`w-full text-left flex items-center justify-between px-3 py-2 text-xs transition-colors cursor-pointer border-b border-stone-50 last:border-0 ${
-                            isHighlighted
-                              ? 'bg-emerald-50 text-emerald-950 font-medium'
-                              : isCurrent
-                              ? 'bg-stone-50 text-stone-900 font-medium'
-                              : 'text-stone-700 hover:bg-stone-50'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                            <span
-                              className={`w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0 ${
-                                isCurrent || isHighlighted
-                                  ? 'bg-emerald-700 text-white shadow-2xs'
-                                  : 'bg-stone-100 text-stone-600'
-                              }`}
-                            >
-                              {surah.surahNumber !== 999 ? surah.surahNumber : '•'}
-                            </span>
-                            <div className="min-w-0 flex-1">
-                              <div className="font-semibold text-stone-900 truncate">
-                                {surah.surahName}
-                              </div>
-                              {surah.surahMeaning && (
-                                <div className="text-[10px] text-stone-500 truncate">
-                                  {surah.surahMeaning}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-1.5 shrink-0 text-[10px] text-stone-400">
-                            {surah.verseCount > 0 && (
-                              <span className="bg-stone-100 text-stone-600 px-1.5 py-0.5 rounded text-[10px]">
-                                {surah.verseCount} {labels.ayatLabel || 'ayat'}
-                              </span>
-                            )}
-                            {isCurrent && <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
-                          </div>
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
-              )}
-            </div>
-
+          {/* Right section: Metadata */}
+          <div className="flex items-center gap-2.5 ml-auto">
             {/* Metadata badge */}
             {activeFile && (
-              <div className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-stone-100/80 border border-stone-200/60 text-[11px] font-mono text-stone-500 shrink-0">
+              <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-stone-100/80 border border-stone-200/60 text-[11px] font-mono text-stone-500 shrink-0">
                 <span>{formattedContent.length} {labels.charactersLabel}</span>
                 <span className="text-stone-300">•</span>
                 <span>{formattedContent.split('\n').length} {labels.linesLabel}</span>
@@ -998,6 +752,7 @@ export default function App() {
                 initialVerse={paramVerse}
                 activeVerse={activeVerse}
                 onVerseChange={setActiveVerse}
+                allFiles={files}
               />
             )
           ) : (

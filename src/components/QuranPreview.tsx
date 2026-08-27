@@ -1,13 +1,14 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Share2, Check } from 'lucide-react';
+import { Share2, Check, Sparkles, Copy, ExternalLink, Image as ImageIcon } from 'lucide-react';
 import {
   AppLanguage,
   UI_LABELS,
   formatSurahNumber,
-  formatRevelationPlace,
 } from '../constants/uiLabels';
-import { SurahJsonObject, VerseItem } from '../types';
-import { toSurahSlug } from '../utils/slugUtils';
+import { SurahJsonObject, VerseItem, FileInfo } from '../types';
+import { toSurahSlug, matchesSurahSlug } from '../utils/slugUtils';
+import { getArabicSurahName } from '../utils/quranMeta';
+import AyatCardModal, { AyatCardData } from './AyatCardModal';
 
 interface QuranPreviewProps {
   jsonString: string;
@@ -17,6 +18,7 @@ interface QuranPreviewProps {
   initialVerse?: number | null;
   activeVerse?: number | null;
   onVerseChange?: (verseNum: number | null) => void;
+  allFiles?: FileInfo[];
 }
 
 export function QuranPreview({
@@ -27,6 +29,7 @@ export function QuranPreview({
   initialVerse = null,
   activeVerse,
   onVerseChange,
+  allFiles = [],
 }: QuranPreviewProps) {
   const labels = UI_LABELS[appLanguage] || UI_LABELS['Bahasa Indonesia'];
   const [localSelectedVerse, setLocalSelectedVerse] = useState<number | null>(initialVerse);
@@ -40,8 +43,13 @@ export function QuranPreview({
   };
 
   const [copiedVerse, setCopiedVerse] = useState<number | null>(null);
+  const [copiedTextVerse, setCopiedTextVerse] = useState<number | null>(null);
   const [copiedSurah, setCopiedSurah] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Ayat Card Modal state
+  const [isCardModalOpen, setIsCardModalOpen] = useState<boolean>(false);
+  const [cardModalVerseNum, setCardModalVerseNum] = useState<number>(1);
 
   const data = useMemo<SurahJsonObject | null>(() => {
     try {
@@ -72,9 +80,7 @@ export function QuranPreview({
   const verseCount = data?.verse_count ?? data?.jumlah_ayat;
   const versesList: VerseItem[] = data?.verses ?? data?.ayat ?? [];
 
-  // Track the current surah number/identifier to distinguish between:
-  // 1. Changing Surah -> reset scroll to top
-  // 2. Changing Language on same Surah -> keep selected verse and scroll to it
+  // Track the current surah number/identifier
   const prevSurahKeyRef = React.useRef<string | null>(null);
 
   useEffect(() => {
@@ -88,7 +94,6 @@ export function QuranPreview({
     }
 
     if (selectedVerse) {
-      // Re-scroll to the selected verse when language/data changes
       const timer1 = setTimeout(() => scrollToVerse(selectedVerse), 100);
       const timer2 = setTimeout(() => scrollToVerse(selectedVerse), 300);
       prevSurahKeyRef.current = currentSurahKey;
@@ -97,7 +102,6 @@ export function QuranPreview({
         clearTimeout(timer2);
       };
     } else {
-      // If no verse is selected, and we changed to a different Surah, scroll to top
       if (currentSurahKey && prevSurahKeyRef.current && prevSurahKeyRef.current !== currentSurahKey) {
         if (containerRef.current) {
           containerRef.current.scrollTo({ top: 0, behavior: 'instant' });
@@ -107,8 +111,108 @@ export function QuranPreview({
     }
   }, [initialVerse, selectedVerse, data, surahNum, surahName, fileName]);
 
+  // Lookup parsed surah files for Arabic cross-reference and Translation cross-reference
+  const pairedSurahs = useMemo(() => {
+    let arabicData: SurahJsonObject | null = null;
+    let targetLangData: SurahJsonObject | null = null;
+    let indonesianData: SurahJsonObject | null = null;
+    let englishData: SurahJsonObject | null = null;
+
+    if (allFiles && allFiles.length > 0) {
+      const targetSlug = toSurahSlug(surahName || fileName);
+
+      // Find Arabic file
+      const arabicFile = allFiles.find((f) => {
+        if (f.folder.toLowerCase() !== 'arabic') return false;
+        return matchesSurahSlug(f.fileName, targetSlug) || (surahNum && f.content.includes(`"surah_number": ${surahNum}`));
+      });
+      if (arabicFile) {
+        try { arabicData = JSON.parse(arabicFile.content); } catch {}
+      }
+
+      // Find user selected appLanguage file (if not Arabic)
+      if (appLanguage && appLanguage.toLowerCase() !== 'arabic') {
+        const langFile = allFiles.find((f) => {
+          if (f.folder.toLowerCase() !== appLanguage.toLowerCase()) return false;
+          return matchesSurahSlug(f.fileName, targetSlug) || (surahNum && (f.content.includes(`"surah_number": ${surahNum}`) || f.content.includes(`"nomor_surah": ${surahNum}`)));
+        });
+        if (langFile) {
+          try { targetLangData = JSON.parse(langFile.content); } catch {}
+        }
+      }
+
+      // Fallback Indonesian
+      const indoFile = allFiles.find((f) => {
+        if (f.folder.toLowerCase() !== 'bahasa indonesia') return false;
+        return matchesSurahSlug(f.fileName, targetSlug) || (surahNum && (f.content.includes(`"nomor_surah": ${surahNum}`) || f.content.includes(`"surah_number": ${surahNum}`)));
+      });
+      if (indoFile) {
+        try { indonesianData = JSON.parse(indoFile.content); } catch {}
+      }
+
+      // Fallback English
+      const engFile = allFiles.find((f) => {
+        if (f.folder.toLowerCase() !== 'english') return false;
+        return matchesSurahSlug(f.fileName, targetSlug) || (surahNum && f.content.includes(`"surah_number": ${surahNum}`));
+      });
+      if (engFile) {
+        try { englishData = JSON.parse(engFile.content); } catch {}
+      }
+    }
+
+    return { arabicData, targetLangData, indonesianData, englishData };
+  }, [allFiles, surahName, fileName, surahNum, appLanguage]);
+
+  // Helper to extract Arabic and Translation text for a specific verse
+  const getVersePair = (vNum: number) => {
+    let arabicText = '';
+    let translationText = '';
+
+    // If current file is Arabic
+    const currentIsArabic = folder.toLowerCase() === 'arabic' || /[\u0600-\u06FF]/.test(versesList[0]?.text || versesList[0]?.teks || '');
+
+    const currentItem = versesList.find(
+      (v, idx) => (v.verse_number ?? v.nomor_ayat ?? v.nomor ?? v.ayat ?? idx + 1) === vNum
+    );
+    const currentText = currentItem?.text ?? currentItem?.teks ?? '';
+
+    if (currentIsArabic) {
+      arabicText = currentText;
+      // In Arabic app language mode, translation is optional
+      if (appLanguage.toLowerCase() === 'arabic') {
+        translationText = '';
+      } else if (pairedSurahs.targetLangData) {
+        const langVerses: VerseItem[] = pairedSurahs.targetLangData.verses ?? pairedSurahs.targetLangData.ayat ?? [];
+        const langItem = langVerses.find((v, idx) => (v.verse_number ?? v.nomor_ayat ?? v.nomor ?? v.ayat ?? idx + 1) === vNum);
+        if (langItem) translationText = langItem.text ?? langItem.teks ?? '';
+      } else if (pairedSurahs.indonesianData) {
+        const indoVerses: VerseItem[] = pairedSurahs.indonesianData.verses ?? pairedSurahs.indonesianData.ayat ?? [];
+        const indoItem = indoVerses.find((v, idx) => (v.verse_number ?? v.nomor_ayat ?? v.nomor ?? v.ayat ?? idx + 1) === vNum);
+        if (indoItem) translationText = indoItem.text ?? indoItem.teks ?? '';
+      } else if (pairedSurahs.englishData) {
+        const engVerses: VerseItem[] = pairedSurahs.englishData.verses ?? [];
+        const engItem = engVerses.find((v, idx) => (v.verse_number ?? idx + 1) === vNum);
+        if (engItem) translationText = engItem.text ?? '';
+      }
+    } else {
+      translationText = currentText;
+      // Find Arabic from paired Arabic
+      const arabVerses: VerseItem[] = pairedSurahs.arabicData?.verses ?? [];
+      const arabItem = arabVerses.find((v, idx) => (v.verse_number ?? idx + 1) === vNum);
+      if (arabItem) {
+        arabicText = arabItem.text ?? '';
+      }
+    }
+
+    return { arabicText, translationText, currentText };
+  };
+
+  const handleOpenAyatCard = (verseNum: number) => {
+    setCardModalVerseNum(verseNum);
+    setIsCardModalOpen(true);
+  };
+
   const handleShareVerse = async (verseNum: number) => {
-    // Construct clean and URL-safe share URL using slug, e.g. /app?ayat=al-anam-105
     const url = new URL(window.location.origin + '/app');
     const rawIdentifier = surahName || (fileName ? fileName.replace(/\.json$/i, '') : (surahNum ? String(surahNum) : '1'));
     const surahSlug = toSurahSlug(rawIdentifier);
@@ -118,7 +222,6 @@ export function QuranPreview({
     }
     const shareUrl = url.toString();
 
-    // Directly copy link to clipboard without triggering any OS share pop-up
     try {
       await navigator.clipboard.writeText(shareUrl);
     } catch {
@@ -133,13 +236,37 @@ export function QuranPreview({
     setCopiedVerse(verseNum);
     setTimeout(() => setCopiedVerse(null), 2500);
 
-    const feedbackText = appLanguage === 'English' ? 'Verse link copied!' : 'Tautan ayat berhasil disalin!';
-    setToastMessage(feedbackText);
+    setToastMessage(labels.copyLinkSuccessToast);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const handleCopyVerseText = async (verseNum: number) => {
+    const { arabicText, translationText, currentText } = getVersePair(verseNum);
+    const surahTag = `QS. ${surahName || 'Surah'} : ${verseNum}`;
+    let formatted = `${surahTag}\n`;
+    if (arabicText) formatted += `${arabicText}\n\n`;
+    if (translationText) formatted += `"${translationText}"\n\n`;
+    else if (!arabicText) formatted += `"${currentText}"\n\n`;
+    formatted += `Baca di: ${window.location.origin}/app?ayat=${toSurahSlug(surahName || String(surahNum))}-${verseNum}`;
+
+    try {
+      await navigator.clipboard.writeText(formatted);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = formatted;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+
+    setCopiedTextVerse(verseNum);
+    setTimeout(() => setCopiedTextVerse(null), 2500);
+    setToastMessage(labels.copyTextSuccessToast);
     setTimeout(() => setToastMessage(null), 2500);
   };
 
   const handleShareSurah = async () => {
-    // Construct clean and URL-safe share URL for surah using slug, e.g. /app?surah=al-anam
     const url = new URL(window.location.origin + '/app');
     const rawIdentifier = surahName || (fileName ? fileName.replace(/\.json$/i, '') : (surahNum ? String(surahNum) : '1'));
     const surahSlug = toSurahSlug(rawIdentifier);
@@ -149,7 +276,6 @@ export function QuranPreview({
     }
     const shareUrl = url.toString();
 
-    // Directly copy link to clipboard without triggering any OS share pop-up
     try {
       await navigator.clipboard.writeText(shareUrl);
     } catch {
@@ -164,10 +290,50 @@ export function QuranPreview({
     setCopiedSurah(true);
     setTimeout(() => setCopiedSurah(false), 2500);
 
-    const feedbackText = appLanguage === 'English' ? 'Surah link copied!' : 'Tautan surah berhasil disalin!';
-    setToastMessage(feedbackText);
+    setToastMessage(labels.copyLinkSuccessToast);
     setTimeout(() => setToastMessage(null), 2500);
   };
+
+  // Build card modal data for current active verse
+  const cardModalData: AyatCardData = useMemo(() => {
+    const vNum = cardModalVerseNum || selectedVerse || 1;
+    const { arabicText, translationText, currentText } = getVersePair(vNum);
+
+    const localizedMeaning =
+      surahMeaning ||
+      pairedSurahs.targetLangData?.surah_meaning ||
+      pairedSurahs.targetLangData?.arti_nama_surah ||
+      (appLanguage.toLowerCase() === 'bahasa indonesia' ? pairedSurahs.indonesianData?.arti_nama_surah : pairedSurahs.englishData?.surah_meaning) ||
+      '';
+
+    return {
+      surahNumber: typeof surahNum === 'number' ? surahNum : parseInt(String(surahNum), 10) || 1,
+      surahName: surahName || 'Surah',
+      surahMeaning: surahMeaning || '',
+      revelationPlace: revPlace || '',
+      totalVerses: verseCount || versesList.length,
+      verseNumber: vNum,
+      verseText: currentText,
+      arabicText: arabicText,
+      translationText: translationText,
+      folder: folder,
+      fileName: fileName,
+    };
+  }, [cardModalVerseNum, selectedVerse, surahNum, surahName, surahMeaning, revPlace, verseCount, versesList, folder, fileName, pairedSurahs, appLanguage]);
+
+  // List of all verses for prev/next in modal
+  const allVersesList = useMemo(() => {
+    return versesList.map((item, idx) => {
+      const vNum = item.verse_number ?? item.nomor_ayat ?? item.nomor ?? item.ayat ?? idx + 1;
+      const { arabicText, translationText, currentText } = getVersePair(vNum);
+      return {
+        verseNumber: vNum,
+        verseText: currentText,
+        arabicText,
+        translationText,
+      };
+    });
+  }, [versesList, pairedSurahs]);
 
   if (!data) {
     return (
@@ -177,8 +343,6 @@ export function QuranPreview({
     );
   }
 
-  const formattedSurahNum = formatSurahNumber(surahNum, labels);
-  const formattedPlace = formatRevelationPlace(revPlace, labels);
   const badgeHeader = labels.surahHeader.replace('#', String(surahNum ?? '—'));
 
   return (
@@ -186,6 +350,18 @@ export function QuranPreview({
       ref={containerRef}
       className="relative flex-1 min-h-0 overflow-y-auto overscroll-contain bg-white text-stone-900 font-sans p-4 sm:p-8"
     >
+      {/* Ayat Card Generator Modal */}
+      {isCardModalOpen && (
+        <AyatCardModal
+          isOpen={isCardModalOpen}
+          onClose={() => setIsCardModalOpen(false)}
+          data={cardModalData}
+          appLanguage={appLanguage}
+          allVerses={allVersesList}
+          onSelectVerse={(vNum) => setCardModalVerseNum(vNum)}
+        />
+      )}
+
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 bg-stone-900/95 text-white text-xs sm:text-sm font-medium rounded-full shadow-2xl flex items-center gap-2 border border-stone-700 animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-none">
@@ -196,56 +372,88 @@ export function QuranPreview({
 
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header Information Card */}
-        <div className="relative bg-stone-50/90 border border-stone-200/90 rounded-2xl p-6 sm:p-8 text-center space-y-2.5 shadow-2xs">
-          {/* Surah Share Button */}
-          <button
-            type="button"
-            onClick={handleShareSurah}
-            aria-label={`Bagikan Surah ${surahName || ''}`}
-            title="Bagikan tautan Surah ini"
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-emerald-50 text-stone-600 hover:text-emerald-700 active:scale-95 border border-stone-200 hover:border-emerald-300 shadow-2xs flex items-center justify-center cursor-pointer transition-all z-10"
-          >
-            {copiedSurah ? (
-              <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-            ) : (
-              <Share2 className="w-4 h-4" />
-            )}
-          </button>
+        <div className="relative bg-gradient-to-b from-stone-50 via-emerald-50/20 to-stone-50/90 border border-stone-200/90 rounded-3xl p-6 sm:p-9 text-center space-y-3.5 shadow-xs overflow-hidden">
+          {/* Subtle Islamic Motif Background Accent */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-radial from-emerald-500/5 to-transparent rounded-full -mr-16 -mt-16 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-radial from-teal-500/5 to-transparent rounded-full -ml-16 -mb-16 pointer-events-none" />
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-semibold border border-emerald-200/60">
-            <span>{badgeHeader}</span>
+          {/* Header Action Buttons */}
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex items-center gap-2 z-10">
+            {/* Surah Share Link Button */}
+            <button
+              type="button"
+              onClick={handleShareSurah}
+              aria-label={`Share ${surahName || ''}`}
+              title={labels.shareVerseBtn}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-emerald-50 text-stone-600 hover:text-emerald-700 active:scale-95 border border-stone-200 hover:border-emerald-300 shadow-2xs flex items-center justify-center cursor-pointer transition-all"
+            >
+              {copiedSurah ? (
+                <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
+              ) : (
+                <Share2 className="w-4 h-4" />
+              )}
+            </button>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-stone-900">
-            {surahName || 'Surah'}
-          </h1>
+          {/* Surah Badge & Folder Tag */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/90 text-emerald-900 text-xs font-semibold border border-emerald-200/80 shadow-2xs">
+            <span className="font-mono">{badgeHeader}</span>
+            {folder && (
+              <>
+                <span className="text-emerald-400">•</span>
+                <span className="text-emerald-800 font-medium">{folder}</span>
+              </>
+            )}
+          </div>
 
-          {surahMeaning && (
-            <p className="text-sm sm:text-base font-medium text-stone-600">
-              ({surahMeaning})
-            </p>
-          )}
+          {/* Main Arabic Surah Title */}
+          {(() => {
+            const rawArabicName = getArabicSurahName(surahNum) || (folder.toLowerCase() === 'arabic' ? surahName : '');
+            const arabicDisplayName = rawArabicName
+              ? (rawArabicName.startsWith('سُورَةُ') || rawArabicName.startsWith('سورة') ? rawArabicName : `سُورَةُ ${rawArabicName}`)
+              : '';
+            
+            return (
+              <div className="space-y-2 pt-1">
+                {arabicDisplayName && (
+                  <h1
+                    dir="rtl"
+                    className="text-4xl sm:text-5xl lg:text-6xl font-bold font-serif text-emerald-950 tracking-wide select-text drop-shadow-2xs leading-relaxed"
+                    style={{ fontFamily: "'Amiri', 'Traditional Arabic', 'Scheherazade New', serif" }}
+                  >
+                    {arabicDisplayName}
+                  </h1>
+                )}
 
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-stone-500 font-medium">
+                {/* Transliterated / Localized Surah Name */}
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900">
+                  {surahName || 'Surah'}
+                </h2>
+              </div>
+            );
+          })()}
+
+          {/* Metadata Row: Surah Number, Revelation Place, and Total Verses */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-stone-600 font-medium">
+            {/* Surah Number (Surah ke berapa) directly from JSON */}
             {surahNum !== undefined && surahNum !== null && (
-              <>
-                <span>
-                  {typeof surahNum === 'number' ? `Surah ${surahNum}` : surahNum}
-                </span>
-                {(revPlace || verseCount || versesList.length > 0) && <span>•</span>}
-              </>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-stone-100/90 border border-stone-200/80">
+                <span className="font-semibold text-stone-800">{formatSurahNumber(surahNum, labels)}</span>
+              </div>
             )}
 
+            {/* Revelation place directly from JSON */}
             {revPlace && (
-              <>
-                <span>{revPlace}</span>
-                {(verseCount || versesList.length > 0) && <span>•</span>}
-              </>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-stone-100/90 border border-stone-200/80">
+                <span className="text-stone-700 font-medium">{revPlace}</span>
+              </div>
             )}
 
-            <span>
-              {verseCount ?? versesList.length} {labels.ayatLabel}
-            </span>
+            {/* Total Verses */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-stone-100/90 border border-stone-200/80">
+              <span className="font-semibold text-stone-800">{verseCount ?? versesList.length}</span>
+              <span className="text-stone-600">{labels.ayatLabel}</span>
+            </div>
           </div>
         </div>
 
@@ -253,66 +461,116 @@ export function QuranPreview({
         <div className="space-y-4 pt-2 pb-6">
           {versesList.map((item, idx) => {
             const verseNum = item.verse_number ?? item.nomor_ayat ?? item.nomor ?? item.ayat ?? idx + 1;
-            const verseText = item.text ?? item.teks ?? '';
-            const isArabicText = /[\u0600-\u06FF]/.test(verseText);
+            const { arabicText, translationText, currentText } = getVersePair(verseNum);
             const isSelected = selectedVerse === verseNum;
 
-            return (
-              <div key={verseNum} className="relative">
-                {/* Round Share Button: Appears on the left side precisely centered vertically when clicked */}
-                {isSelected && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleShareVerse(verseNum);
-                    }}
-                    aria-label={`Bagikan Ayat ${verseNum}`}
-                    title="Bagikan tautan ayat ini"
-                    className="absolute -left-12 sm:-left-14 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-800 hover:bg-emerald-900 active:scale-90 text-white shadow-lg shadow-emerald-950/25 flex items-center justify-center cursor-pointer transition-all duration-200 z-20 animate-in fade-in zoom-in-75"
-                  >
-                    {copiedVerse === verseNum ? (
-                      <Check className="w-4 h-4 text-white stroke-[2.5]" />
-                    ) : (
-                      <Share2 className="w-4 h-4 text-white" />
-                    )}
-                  </button>
-                )}
+            // Determine if the current active file contains Arabic script or is from Arabic folder
+            const isCurrentArabic = folder.toLowerCase() === 'arabic' || /[\u0600-\u06FF]/.test(currentText);
 
-                {/* Verse box with simple animation and dark green styling on click */}
+            return (
+              <div key={verseNum} className="relative group">
+                {/* Verse box with interactive animation and green highlight on click */}
                 <div
                   id={`verse-${verseNum}`}
                   onClick={() => handleSelectVerse(isSelected ? null : verseNum)}
-                  className={`flex items-start gap-4 p-4 sm:p-5 rounded-xl cursor-pointer transition-all duration-300 ease-out active:scale-[0.995] ${
+                  className={`flex flex-col gap-4 p-4 sm:p-6 rounded-2xl cursor-pointer transition-all duration-300 ease-out active:scale-[0.995] ${
                     isSelected
                       ? 'bg-emerald-950/[0.03] border-2 border-emerald-800 shadow-md ring-4 ring-emerald-800/10 scale-[1.01] sm:scale-[1.015]'
-                      : 'bg-white border border-stone-150 hover:border-stone-300 hover:shadow-xs shadow-2xs'
+                      : 'bg-white border border-stone-200/90 hover:border-emerald-300 hover:shadow-xs shadow-2xs'
                   }`}
                 >
-                  {/* Verse Number Circle */}
-                  <div
-                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 mt-0.5 shadow-2xs transition-all duration-300 ${
-                      isSelected
-                        ? 'bg-emerald-800 text-white border border-emerald-900 scale-105 shadow-sm'
-                        : 'bg-emerald-50 text-emerald-800 border border-emerald-200/80'
-                    }`}
-                  >
-                    {verseNum}
+                  {/* Top row of the verse item: Verse Number Badge & Main Verse Text */}
+                  <div className="flex items-start gap-4">
+                    {/* Verse Number Circle */}
+                    <div
+                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 mt-0.5 shadow-2xs transition-all duration-300 ${
+                        isSelected
+                          ? 'bg-emerald-800 text-white border border-emerald-900 scale-105 shadow-sm'
+                          : 'bg-emerald-50 text-emerald-850 border border-emerald-200/80 text-emerald-900'
+                      }`}
+                    >
+                      {verseNum}
+                    </div>
+
+                    {/* Main Verse Text based on selected Language/File */}
+                    <div className="flex-1 min-w-0 pt-0.5">
+                      {isCurrentArabic ? (
+                        <p
+                          dir="rtl"
+                          className="font-['Amiri',serif] text-2xl sm:text-3xl lg:text-4xl leading-[2.3] sm:leading-[2.5] text-stone-900 font-normal text-right select-text tracking-wide"
+                          style={{ fontFamily: "'Amiri', 'Traditional Arabic', 'Scheherazade New', serif" }}
+                        >
+                          {currentText || arabicText}
+                        </p>
+                      ) : (
+                        <p
+                          dir="ltr"
+                          className="text-left font-sans text-stone-800 text-sm sm:text-[15px] sm:leading-relaxed select-text"
+                        >
+                          {currentText || translationText}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Verse Text */}
-                  <div className="flex-1 min-w-0 pt-1">
-                    <p
-                      dir={isArabicText ? 'rtl' : 'ltr'}
-                      className={
-                        isArabicText
-                          ? 'text-right font-serif text-2xl sm:text-3xl leading-[2.2] sm:leading-[2.4] text-stone-900 tracking-wide font-normal'
-                          : 'text-left font-sans text-stone-800 text-sm sm:text-base leading-relaxed'
-                      }
-                    >
-                      {verseText}
-                    </p>
-                  </div>
+                  {/* Dynamic Action Toolbar on Verse Click / Active */}
+                  {isSelected && (
+                    <div className="mt-2 pt-3 border-t border-emerald-900/10 flex flex-wrap items-center justify-between gap-2 animate-in fade-in slide-in-from-top-1 duration-150">
+                      {/* Left: Ayat Card Trigger Button (PnL Meme Card Style) */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenAyatCard(verseNum);
+                        }}
+                        className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold shadow-md shadow-emerald-950/20 flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                        <span>{labels.ayatCardBtn}</span>
+                      </button>
+
+                      {/* Right: Quick Copy & Share buttons */}
+                      <div className="flex items-center gap-1.5 ml-auto">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopyVerseText(verseNum);
+                          }}
+                          className="px-2.5 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium border border-stone-200/80 flex items-center gap-1 transition-all"
+                          title={labels.copyTextBtn}
+                        >
+                          {copiedTextVerse === verseNum ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5 text-stone-500" />
+                          )}
+                          <span className="hidden sm:inline">
+                            {copiedTextVerse === verseNum ? labels.copiedText : labels.copyTextBtn}
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleShareVerse(verseNum);
+                          }}
+                          className="px-2.5 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium border border-stone-200/80 flex items-center gap-1 transition-all"
+                          title={labels.shareVerseBtn}
+                        >
+                          {copiedVerse === verseNum ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Share2 className="w-3.5 h-3.5 text-stone-500" />
+                          )}
+                          <span className="hidden sm:inline">
+                            {copiedVerse === verseNum ? labels.copiedLink : labels.shareVerseBtn}
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             );
