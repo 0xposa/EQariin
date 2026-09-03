@@ -33,6 +33,8 @@ export interface LandingTranslation {
   sourcesTitle: string;
   sourcesDesc: string;
   contact: string;
+  seeMore: string;
+  seeLess: string;
 }
 
 export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
@@ -60,6 +62,8 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
     langFilterSoon: "Coming Soon",
     langSearchPlaceholder: "Search world language or region...",
     langAvailableBadge: "Available",
+    seeMore: "See More",
+    seeLess: "See Less",
     investorTitle: "Become an Investor & Strategic Partner",
     investorDesc: "Join Muslim Plus as an investor or strategic backer. Accelerate the development of the world's most comprehensive open multilingual Quran dataset ecosystem and empower global Islamic tech innovation.",
     investorBtn: "Connect with Our Investment Team",
@@ -94,6 +98,8 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
     langFilterSoon: "Segera Hadir",
     langSearchPlaceholder: "Cari bahasa dunia atau wilayah...",
     langAvailableBadge: "Tersedia",
+    seeMore: "Lihat Selengkapnya",
+    seeLess: "Tampilkan Lebih Sedikit",
     investorTitle: "Peluang Investasi & Kemitraan Strategis",
     investorDesc: "Bergabunglah bersama Muslim Plus sebagai investor dan mitra strategis. Bersama kita akselerasi pembangunan ekosistem dataset Al-Quran digital multibahasa terlengkap di dunia serta berdayakan inovasi teknologi Islami global.",
     investorBtn: "Hubungi Tim Investasi",
@@ -128,6 +134,8 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
     langFilterSoon: "قريباً",
     langSearchPlaceholder: "ابحث عن لغة أو منطقة...",
     langAvailableBadge: "متاح",
+    seeMore: "عرض المزيد",
+    seeLess: "عرض أقل",
     investorTitle: "فرص الاستثمار والشراكة الاستراتيجية",
     investorDesc: "انضم إلى Muslim Plus كمستثمر وشريك استراتيجي لتسريع تطوير أكبر منظومة بيانات قرآنية رقمية مفتوحة ومتعددة اللغات، وتمكين الابتكار التكنولوجي الإسلامي العالمي.",
     investorBtn: "تواصل مع فريق الاستثمار",
@@ -162,6 +170,8 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
     langFilterSoon: "即将推出",
     langSearchPlaceholder: "搜索世界语言或地区...",
     langAvailableBadge: "可用",
+    seeMore: "查看更多",
+    seeLess: "收起",
     investorTitle: "投资与战略合作契机",
     investorDesc: "加入 Muslim Plus 成为我们的投资人与战略伙伴。共同加速构建全球最全面的多语言数字古兰经开放数据生态，赋能全球伊斯兰科技创新。",
     investorBtn: "联系投资合作团队",
@@ -196,6 +206,8 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
     langFilterSoon: "Próximamente",
     langSearchPlaceholder: "Buscar idioma o región del mundo...",
     langAvailableBadge: "Disponible",
+    seeMore: "Ver más",
+    seeLess: "Ver menos",
     investorTitle: "Oportunidades de Inversión y Alianzas Estratégicas",
     investorDesc: "Únete a Muslim Plus como inversor y socio estratégico. Acelera el desarrollo del ecosistema de datos del Corán multilingüe más completo del mundo e impulsa la innovación tecnológica islámica.",
     investorBtn: "Contactar al Equipo de Inversión",
@@ -230,6 +242,8 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
     langFilterSoon: "近日公開",
     langSearchPlaceholder: "世界の言語や地域を検索...",
     langAvailableBadge: "利用可能",
+    seeMore: "もっと見る",
+    seeLess: "折りたたむ",
     investorTitle: "投資家・戦略的パートナー募集",
     investorDesc: "Muslim Plusの投資家・戦略的パートナーとして参画しませんか。世界最高峰の多言語デジタルコーランデータエコシステムの発展を加速させ、グローバルなイスラムテックイノベーションを推進します。",
     investorBtn: "投資チームへ問い合わせる",
@@ -264,6 +278,8 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
     langFilterSoon: "Çok Yakında",
     langSearchPlaceholder: "Dünya dili veya bölge ara...",
     langAvailableBadge: "Kullanılabilir",
+    seeMore: "Daha Fazla Gör",
+    seeLess: "Daha Az Gör",
     investorTitle: "Yatırımcı ve Stratejik Ortaklık Fırsatları",
     investorDesc: "Muslim Plus'a yatırımcı ve stratejik ortak olarak katılın. Dünyanın en kapsamlı çok dilli dijital Kuran veri ekosisteminin gelişimini hızlandırın ve küresel İslami teknoloji inovasyonunu güçlendirin.",
     investorBtn: "Yatırım Ekibiyle İletişime Geçin",
@@ -298,6 +314,8 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
     langFilterSoon: "Bientôt",
     langSearchPlaceholder: "Rechercher une langue ou région...",
     langAvailableBadge: "Disponible",
+    seeMore: "Voir plus",
+    seeLess: "Voir moins",
     investorTitle: "Devenez Investisseur et Partenaire Stratégique",
     investorDesc: "Rejoignez Muslim Plus en tant qu'investisseur et partenaire stratégique. Accélérez le développement du plus vaste écosystème de données coraniques multilingues et propulsez l'innovation islamique mondiale.",
     investorBtn: "Contacter l'Équipe d'Investissement",
@@ -332,6 +350,8 @@ export const LANDING_TRANSLATIONS: Record<AppLanguage, LandingTranslation> = {
     langFilterSoon: "Akan Datang",
     langSearchPlaceholder: "Cari bahasa dunia atau wilayah...",
     langAvailableBadge: "Tersedia",
+    seeMore: "Lihat Lagi",
+    seeLess: "Tunjukkan Sedikit",
     investorTitle: "Peluang Pelaburan & Perkongsian Strategik",
     investorDesc: "Sertai Muslim Plus sebagai pelabur dan rakan kongsi strategik. Bersama kita memacu pembangunan ekosistem set data Al-Quran digital pelbagai bahasa yang paling komprehensif di dunia.",
     investorBtn: "Hubungi Pasukan Pelaburan",

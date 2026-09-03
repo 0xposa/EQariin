@@ -2,34 +2,34 @@
   "surah_number": 1,
   "surah_name": "Al-Fatihah",
   "revelation_place": "Makkiyyah",
-  "verse_count": 7,
-  "verses": [
+  "ayat_count": 7,
+  "ayat": [
     {
-      "verse_number": 1,
+      "ayat_number": 1,
       "text": "奉至仁至慈的真主之名"
     },
     {
-      "verse_number": 2,
+      "ayat_number": 2,
       "text": "一切赞颂，全归真主，全世界的主，"
     },
     {
-      "verse_number": 3,
+      "ayat_number": 3,
       "text": "至仁至慈的主，"
     },
     {
-      "verse_number": 4,
+      "ayat_number": 4,
       "text": "报应日的主。"
     },
     {
-      "verse_number": 5,
+      "ayat_number": 5,
       "text": "我们只崇拜你，只求你佑助。"
     },
     {
-      "verse_number": 6,
+      "ayat_number": 6,
       "text": "求你引导我们遵循正路，"
     },
     {
-      "verse_number": 7,
+      "ayat_number": 7,
       "text": "你所施恩者的路，不是受谴怒者的路，也不是迷误者的路。"
     }
   ]

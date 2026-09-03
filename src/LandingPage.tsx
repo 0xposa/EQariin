@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Github, Database, BookOpen, TrendingUp, Handshake, Code2, ArrowRight, Search, Clock, MapPin } from 'lucide-react';
+import { Globe, Github, Database, BookOpen, TrendingUp, Handshake, Code2, ArrowRight, Search, Clock, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { useLanguage } from './context/LanguageContext';
 import Navbar from './components/Navbar';
@@ -35,6 +35,9 @@ export default function LandingPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'available' | 'soon'>('all');
   const [selectedRegion, setSelectedRegion] = useState<LanguageRegion>('All');
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const INITIAL_LIMIT = 8;
 
   const t = LANDING_TRANSLATIONS[appLanguage] || LANDING_TRANSLATIONS['English'];
   const labels = UI_LABELS[appLanguage] || UI_LABELS['English'];
@@ -59,6 +62,12 @@ export default function LandingPage() {
       return matchesStatus && matchesRegion && matchesQuery;
     });
   }, [statusFilter, selectedRegion, searchQuery]);
+
+  const visibleLanguages = useMemo(() => {
+    return isExpanded ? filteredLanguages : filteredLanguages.slice(0, INITIAL_LIMIT);
+  }, [filteredLanguages, isExpanded]);
+
+  const hasMore = filteredLanguages.length > INITIAL_LIMIT;
 
   const availableCount = useMemo(() => WORLD_LANGUAGES.filter(l => l.status === 'available').length, []);
   const soonCount = useMemo(() => WORLD_LANGUAGES.filter(l => l.status === 'soon').length, []);
@@ -448,55 +457,95 @@ export default function LandingPage() {
 
         {/* World Languages Grid */}
         {filteredLanguages.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 max-w-6xl mx-auto">
-            {filteredLanguages.map((lang) => {
-              const isAvailable = lang.status === 'available';
+          <div className="flex flex-col items-center">
+            <motion.div 
+              layout="position"
+              className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 max-w-6xl mx-auto"
+            >
+              <AnimatePresence mode="popLayout" initial={false}>
+                {visibleLanguages.map((lang, index) => {
+                  const isAvailable = lang.status === 'available';
 
-              return (
-                <div
-                  key={lang.id}
-                  className={`relative p-4 rounded-2xl border transition-all duration-150 flex flex-col justify-between ${
-                    isAvailable
-                      ? 'bg-white border-emerald-300 shadow-sm ring-1 ring-emerald-100'
-                      : 'bg-white/90 border-stone-200/90 shadow-2xs'
-                  }`}
-                >
-                  <div>
-                    {/* Top: Language Name & Status Badge */}
-                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                  return (
+                    <motion.div
+                      layout
+                      key={lang.id}
+                      initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.95, y: 16 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 10, transition: { duration: 0.2 } }}
+                      transition={{
+                        layout: { duration: 0.35, ease: [0.25, 1, 0.5, 1] },
+                        opacity: { duration: 0.25 },
+                        scale: { duration: 0.25 },
+                        delay: isExpanded && index >= INITIAL_LIMIT ? Math.min((index - INITIAL_LIMIT) * 0.02, 0.3) : 0,
+                      }}
+                      className={`relative p-4 rounded-2xl border transition-all duration-150 flex flex-col justify-between ${
+                        isAvailable
+                          ? 'bg-white border-emerald-300 shadow-sm ring-1 ring-emerald-100'
+                          : 'bg-white/90 border-stone-200/90 shadow-2xs'
+                      }`}
+                    >
                       <div>
-                        <h3 className="font-bold text-stone-900 text-sm md:text-base tracking-tight leading-snug">
-                          {lang.name}
-                        </h3>
-                        <div className="font-['Amiri'] text-stone-500 text-xs md:text-sm font-normal tracking-wide mt-0.5">
-                          {lang.nativeName}
+                        {/* Top: Language Name & Status Badge */}
+                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                          <div>
+                            <h3 className="font-bold text-stone-900 text-sm md:text-base tracking-tight leading-snug">
+                              {lang.name}
+                            </h3>
+                            <div className="font-['Amiri'] text-stone-500 text-xs md:text-sm font-normal tracking-wide mt-0.5">
+                              {lang.nativeName}
+                            </div>
+                          </div>
+                          
+                          {isAvailable ? (
+                            <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                              {t.langAvailableBadge}
+                            </span>
+                          ) : (
+                            <span className="shrink-0 inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-300/80 px-2 py-0.5 rounded-full shadow-2xs">
+                              <Clock className="w-2.5 h-2.5 text-amber-700" />
+                              {t.soonBadge}
+                            </span>
+                          )}
                         </div>
                       </div>
-                      
-                      {isAvailable ? (
-                        <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                          {t.langAvailableBadge}
-                        </span>
-                      ) : (
-                        <span className="shrink-0 inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-300/80 px-2 py-0.5 rounded-full shadow-2xs">
-                          <Clock className="w-2.5 h-2.5 text-amber-700" />
-                          {t.soonBadge}
-                        </span>
-                      )}
-                    </div>
-                  </div>
 
-                  {/* Countries Info */}
-                  <div className="pt-2.5 mt-2 border-t border-stone-100 flex items-start gap-1.5 text-[11px] text-stone-500">
-                    <MapPin className="w-3 h-3 text-stone-400 shrink-0 mt-0.5" />
-                    <span className="line-clamp-2 leading-relaxed" title={lang.countries}>
-                      {lang.countries}
+                      {/* Countries Info */}
+                      <div className="pt-2.5 mt-2 border-t border-stone-100 flex items-start gap-1.5 text-[11px] text-stone-500">
+                        <MapPin className="w-3 h-3 text-stone-400 shrink-0 mt-0.5" />
+                        <span className="line-clamp-2 leading-relaxed" title={lang.countries}>
+                          {lang.countries}
+                        </span>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* See More / See Less Button */}
+            {hasMore && (
+              <motion.div layout="position" className="mt-8 flex justify-center w-full">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded((prev) => !prev)}
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-stone-50 text-emerald-950 border border-stone-200 shadow-xs hover:shadow-sm font-semibold text-xs md:text-sm transition-all duration-150 cursor-pointer group"
+                >
+                  <span>{isExpanded ? t.seeLess : t.seeMore}</span>
+                  {!isExpanded && (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+                      +{filteredLanguages.length - INITIAL_LIMIT}
                     </span>
-                  </div>
-                </div>
-              );
-            })}
+                  )}
+                  {isExpanded ? (
+                    <ChevronUp className="w-4 h-4 text-emerald-700 transition-transform group-hover:-translate-y-0.5" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-emerald-700 transition-transform group-hover:translate-y-0.5" />
+                  )}
+                </button>
+              </motion.div>
+            )}
           </div>
         ) : (
           <div className="text-center py-16 bg-white border border-stone-200 rounded-3xl max-w-xl mx-auto shadow-sm">

@@ -1,4 +1,5 @@
 export interface VerseItem {
+  ayat_number?: number;
   verse_number?: number;
   nomor_ayat?: number;
   nomor?: number;
@@ -17,6 +18,7 @@ export interface SurahJsonObject {
   arti_nama_surah?: string;
   revelation_place?: string;
   tempat_turun?: string;
+  ayat_count?: number;
   verse_count?: number;
   jumlah_ayat?: number;
   verses?: VerseItem[];

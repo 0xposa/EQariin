@@ -77,7 +77,7 @@ export function QuranPreview({
   const surahName = data?.surah_name ?? data?.nama_surah;
   const surahMeaning = data?.surah_meaning ?? data?.arti_nama_surah;
   const revPlace = data?.revelation_place ?? data?.tempat_turun;
-  const verseCount = data?.verse_count ?? data?.jumlah_ayat;
+  const verseCount = data?.ayat_count ?? data?.verse_count ?? data?.jumlah_ayat;
   const versesList: VerseItem[] = data?.verses ?? data?.ayat ?? [];
 
   // Track the current surah number/identifier
@@ -172,7 +172,7 @@ export function QuranPreview({
     const currentIsArabic = folder.toLowerCase() === 'arabic' || /[\u0600-\u06FF]/.test(versesList[0]?.text || versesList[0]?.teks || '');
 
     const currentItem = versesList.find(
-      (v, idx) => (v.verse_number ?? v.nomor_ayat ?? v.nomor ?? v.ayat ?? idx + 1) === vNum
+      (v, idx) => (v.ayat_number ?? v.verse_number ?? v.nomor_ayat ?? v.nomor ?? v.ayat ?? idx + 1) === vNum
     );
     const currentText = currentItem?.text ?? currentItem?.teks ?? '';
 
@@ -183,22 +183,22 @@ export function QuranPreview({
         translationText = '';
       } else if (pairedSurahs.targetLangData) {
         const langVerses: VerseItem[] = pairedSurahs.targetLangData.verses ?? pairedSurahs.targetLangData.ayat ?? [];
-        const langItem = langVerses.find((v, idx) => (v.verse_number ?? v.nomor_ayat ?? v.nomor ?? v.ayat ?? idx + 1) === vNum);
+        const langItem = langVerses.find((v, idx) => (v.ayat_number ?? v.verse_number ?? v.nomor_ayat ?? v.nomor ?? v.ayat ?? idx + 1) === vNum);
         if (langItem) translationText = langItem.text ?? langItem.teks ?? '';
       } else if (pairedSurahs.indonesianData) {
         const indoVerses: VerseItem[] = pairedSurahs.indonesianData.verses ?? pairedSurahs.indonesianData.ayat ?? [];
-        const indoItem = indoVerses.find((v, idx) => (v.verse_number ?? v.nomor_ayat ?? v.nomor ?? v.ayat ?? idx + 1) === vNum);
+        const indoItem = indoVerses.find((v, idx) => (v.ayat_number ?? v.verse_number ?? v.nomor_ayat ?? v.nomor ?? v.ayat ?? idx + 1) === vNum);
         if (indoItem) translationText = indoItem.text ?? indoItem.teks ?? '';
       } else if (pairedSurahs.englishData) {
-        const engVerses: VerseItem[] = pairedSurahs.englishData.verses ?? [];
-        const engItem = engVerses.find((v, idx) => (v.verse_number ?? idx + 1) === vNum);
+        const engVerses: VerseItem[] = pairedSurahs.englishData.ayat ?? pairedSurahs.englishData.verses ?? [];
+        const engItem = engVerses.find((v, idx) => (v.ayat_number ?? v.verse_number ?? idx + 1) === vNum);
         if (engItem) translationText = engItem.text ?? '';
       }
     } else {
       translationText = currentText;
       // Find Arabic from paired Arabic
-      const arabVerses: VerseItem[] = pairedSurahs.arabicData?.verses ?? [];
-      const arabItem = arabVerses.find((v, idx) => (v.verse_number ?? idx + 1) === vNum);
+      const arabVerses: VerseItem[] = pairedSurahs.arabicData?.ayat ?? pairedSurahs.arabicData?.verses ?? [];
+      const arabItem = arabVerses.find((v, idx) => (v.ayat_number ?? v.verse_number ?? idx + 1) === vNum);
       if (arabItem) {
         arabicText = arabItem.text ?? '';
       }
@@ -324,7 +324,7 @@ export function QuranPreview({
   // List of all verses for prev/next in modal
   const allVersesList = useMemo(() => {
     return versesList.map((item, idx) => {
-      const vNum = item.verse_number ?? item.nomor_ayat ?? item.nomor ?? item.ayat ?? idx + 1;
+      const vNum = item.ayat_number ?? item.verse_number ?? item.nomor_ayat ?? item.nomor ?? item.ayat ?? idx + 1;
       const { arabicText, translationText, currentText } = getVersePair(vNum);
       return {
         verseNumber: vNum,
@@ -342,8 +342,6 @@ export function QuranPreview({
       </div>
     );
   }
-
-  const badgeHeader = labels.surahHeader.replace('#', String(surahNum ?? '—'));
 
   return (
     <div
@@ -395,16 +393,7 @@ export function QuranPreview({
             </button>
           </div>
 
-          {/* Surah Badge & Folder Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/90 text-emerald-900 text-xs font-semibold border border-emerald-200/80 shadow-2xs">
-            <span className="font-mono">{badgeHeader}</span>
-            {folder && (
-              <>
-                <span className="text-emerald-400">•</span>
-                <span className="text-emerald-800 font-medium">{folder}</span>
-              </>
-            )}
-          </div>
+
 
           {/* Main Arabic Surah Title */}
           {(() => {
@@ -433,26 +422,34 @@ export function QuranPreview({
             );
           })()}
 
-          {/* Metadata Row: Surah Number, Revelation Place, and Total Verses */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-stone-600 font-medium">
+          {/* Metadata Row: Surah Number, Revelation Place, and Total Ayat */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-stone-500 font-medium">
             {/* Surah Number (Surah ke berapa) directly from JSON */}
             {surahNum !== undefined && surahNum !== null && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-stone-100/90 border border-stone-200/80">
-                <span className="font-semibold text-stone-800">{formatSurahNumber(surahNum, labels)}</span>
+              <div className="inline-flex items-center gap-1">
+                <span>{formatSurahNumber(surahNum, labels)}</span>
               </div>
+            )}
+
+            {surahNum !== undefined && surahNum !== null && revPlace && (
+              <span className="text-stone-300 select-none">•</span>
             )}
 
             {/* Revelation place directly from JSON */}
             {revPlace && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-stone-100/90 border border-stone-200/80">
-                <span className="text-stone-700 font-medium">{revPlace}</span>
+              <div className="inline-flex items-center gap-1">
+                <span>{revPlace}</span>
               </div>
             )}
 
-            {/* Total Verses */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-stone-100/90 border border-stone-200/80">
-              <span className="font-semibold text-stone-800">{verseCount ?? versesList.length}</span>
-              <span className="text-stone-600">{labels.ayatLabel}</span>
+            {((surahNum !== undefined && surahNum !== null) || revPlace) && (
+              <span className="text-stone-300 select-none">•</span>
+            )}
+
+            {/* Total Verses / Ayat */}
+            <div className="inline-flex items-center gap-1">
+              <span>{verseCount ?? versesList.length}</span>
+              <span>{labels.ayatLabel}</span>
             </div>
           </div>
         </div>
@@ -460,7 +457,7 @@ export function QuranPreview({
         {/* Verses List */}
         <div className="space-y-4 pt-2 pb-6">
           {versesList.map((item, idx) => {
-            const verseNum = item.verse_number ?? item.nomor_ayat ?? item.nomor ?? item.ayat ?? idx + 1;
+            const verseNum = item.ayat_number ?? item.verse_number ?? item.nomor_ayat ?? item.nomor ?? item.ayat ?? idx + 1;
             const { arabicText, translationText, currentText } = getVersePair(verseNum);
             const isSelected = selectedVerse === verseNum;
 

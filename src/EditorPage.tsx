@@ -584,7 +584,8 @@ export default function App() {
         if (parsed.revelation_place) revelationPlace = parsed.revelation_place;
         else if (parsed.tempat_turun) revelationPlace = parsed.tempat_turun;
 
-        if (typeof parsed.verse_count === 'number') verseCount = parsed.verse_count;
+        if (typeof parsed.ayat_count === 'number') verseCount = parsed.ayat_count;
+        else if (typeof parsed.verse_count === 'number') verseCount = parsed.verse_count;
         else if (typeof parsed.jumlah_ayat === 'number') verseCount = parsed.jumlah_ayat;
         else if (Array.isArray(parsed.verses)) verseCount = parsed.verses.length;
         else if (Array.isArray(parsed.ayat)) verseCount = parsed.ayat.length;

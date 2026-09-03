@@ -2,34 +2,34 @@
   "surah_number": 1,
   "surah_name": "Al-Fatihah",
   "revelation_place": "Makkiyyah",
-  "verse_count": 7,
-  "verses": [
+  "ayat_count": 7,
+  "ayat": [
     {
-      "verse_number": 1,
+      "ayat_number": 1,
       "text": "In the name of Allah, the Entirely Merciful, the Especially Merciful."
     },
     {
-      "verse_number": 2,
+      "ayat_number": 2,
       "text": "[All] praise is due to Allah, Lord of the worlds -"
     },
     {
-      "verse_number": 3,
+      "ayat_number": 3,
       "text": "The Entirely Merciful, the Especially Merciful,"
     },
     {
-      "verse_number": 4,
+      "ayat_number": 4,
       "text": "Sovereign of the Day of Recompense."
     },
     {
-      "verse_number": 5,
+      "ayat_number": 5,
       "text": "It is You we worship and You we ask for help."
     },
     {
-      "verse_number": 6,
+      "ayat_number": 6,
       "text": "Guide us to the straight path -"
     },
     {
-      "verse_number": 7,
+      "ayat_number": 7,
       "text": "The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray."
     }
   ]

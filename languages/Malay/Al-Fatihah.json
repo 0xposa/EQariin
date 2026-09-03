@@ -2,34 +2,34 @@
   "surah_number": 1,
   "surah_name": "Al-Fatihah",
   "revelation_place": "Makkiyyah",
-  "verse_count": 7,
-  "verses": [
+  "ayat_count": 7,
+  "ayat": [
     {
-      "verse_number": 1,
+      "ayat_number": 1,
       "text": "Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani."
     },
     {
-      "verse_number": 2,
+      "ayat_number": 2,
       "text": "Segala puji tertentu bagi Allah, Tuhan yang memelihara dan mentadbirkan sekalian alam."
     },
     {
-      "verse_number": 3,
+      "ayat_number": 3,
       "text": "Yang Maha Pemurah, lagi Maha Mengasihani."
     },
     {
-      "verse_number": 4,
+      "ayat_number": 4,
       "text": "Yang Menguasai pemerintahan hari Pembalasan (hari Akhirat)."
     },
     {
-      "verse_number": 5,
+      "ayat_number": 5,
       "text": "Engkaulah sahaja (Ya Allah) yang kami sembah, dan kepada Engkaulah sahaja kami memohon pertolongan."
     },
     {
-      "verse_number": 6,
+      "ayat_number": 6,
       "text": "Tunjukkanlah kami jalan yang lurus."
     },
     {
-      "verse_number": 7,
+      "ayat_number": 7,
       "text": "Yaitu jalan orang-orang yang Engkau telah kurniakan nikmat kepada mereka, bukan (jalan) orang-orang yang Engkau telah murkai, dan bukan pula (jalan) orang-orang yang sesat."
     }
   ]
