@@ -658,7 +658,7 @@ export default function App() {
   }, [activeFile]);
 
   return (
-    <div className="fixed inset-0 h-[100dvh] w-full bg-stone-50 text-slate-800 flex flex-col font-sans overflow-hidden overscroll-none select-none">
+    <div className="fixed inset-0 h-[100dvh] w-full bg-white text-slate-800 flex flex-col font-sans overflow-hidden overscroll-none select-none">
       {/* Shared Navbar (Identical to Landing Page) */}
       <Navbar />
 
@@ -736,10 +736,10 @@ export default function App() {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-h-0 p-3 sm:p-4 md:p-6 flex flex-col z-20 max-w-[1920px] w-full mx-auto">
+      <main className="flex-1 min-h-0 flex flex-col z-20 w-full">
         
-        {/* Content Box (Code / Preview) */}
-        <div className="w-full flex-1 min-h-0 bg-white border border-stone-200 rounded-xl shadow-2xs flex flex-col overflow-hidden">
+        {/* Content Area (Code / Preview) */}
+        <div className="w-full flex-1 min-h-0 bg-white flex flex-col overflow-hidden">
           {/* Viewer Content Body (Only area that scrolls) */}
           {activeFile ? (
             viewMode === 'code' ? (
