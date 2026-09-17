@@ -329,7 +329,7 @@ export default function AyatCardModal({
                 </span>
               </div>
               <p className="text-[11px] text-stone-400">
-                {surahBadge} • {surahName}
+                {surahBadge} • {surahName}{data.surahMeaning && appLanguage.toLowerCase() !== 'arabic' ? ` (${data.surahMeaning})` : ''}
               </p>
             </div>
           </div>
@@ -404,7 +404,10 @@ export default function AyatCardModal({
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     </div>
                     <div className="text-base sm:text-lg font-black tracking-tight font-sans">
-                      {surahName}
+                      <span>{surahName}</span>
+                      {data.surahMeaning && appLanguage.toLowerCase() !== 'arabic' && (
+                        <span className="font-semibold opacity-85 text-sm ml-1.5">({data.surahMeaning})</span>
+                      )}
                     </div>
                   </div>
                 </div>

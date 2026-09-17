@@ -43,7 +43,11 @@
 
 ## 5. UI Language vs Content Language Separation
 - The "App Language" selector (UI chrome labels only) is fully independent from the "Select Language Folder" dropdown (surah content).
-- `surah_name` and `surah_meaning` displayed in the Preview MUST always follow the currently opened data folder — NEVER the "App Language" selection.
+- **Surah Meaning beside Surah Name**: The value from the `surah_meaning` key is displayed directly beside `surah_name` in parentheses (e.g. `Al-Baqarah (Sapi Betina)`).
+  - The value of `surah_meaning` follows the active App Language (`appLanguage`).
+  - **Exception for Arabic**: This does NOT apply to Arabic (`tidak berlaku bagi bahasa arab!`). When Arabic is selected as the App Language, `surah_meaning` is omitted.
+  - **Strict No-Fallback Rule**: If the JSON file for that surah in the target language does not exist in the `languages/` folders, `surah_meaning` MUST NOT be filled (must remain empty). Never use hardcoded dictionaries, artificial fallbacks, or surrogate translations. This applies strictly to ALL languages.
+- `surah_name` itself follows the raw name from the active JSON data.
 - Only generic UI chrome text (buttons, badges, breadcrumb labels like "languages", verse/surah number prefixes, revelation place translation) follows "App Language", via the `uiLabels.ts` dictionary.
 - **Universal "Ayat" Terminology**: Across ALL languages (English, Arabic, Mandarin, Spanish, Japanese, Turkish, French, Malay, Bahasa Indonesia), the label for verses MUST always use the word `"Ayat"` (e.g. `ayatLabel: "Ayat"`, `ayat_number`, `ayat_count`).
 

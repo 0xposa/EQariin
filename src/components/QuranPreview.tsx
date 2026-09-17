@@ -294,22 +294,36 @@ export function QuranPreview({
     setTimeout(() => setToastMessage(null), 2500);
   };
 
+  // Determine surah_meaning according to appLanguage
+  // Rule: Value dari key surah_meaning mengikuti bahasa aplikasi, tidak berlaku bagi bahasa arab!
+  // Rule: Jika tidak ada berkas JSON-nya untuk bahasa tersebut, maka jangan diisi (kosong), berlaku pada semua bahasa!
+  const appMeaning = useMemo(() => {
+    if (!appLanguage || appLanguage.toLowerCase() === 'arabic') {
+      return '';
+    }
+
+    // 1. If the current active file itself is in the target appLanguage folder
+    if (folder && folder.toLowerCase() === appLanguage.toLowerCase()) {
+      if (surahMeaning) return surahMeaning;
+    }
+
+    // 2. From matched file in the target appLanguage folder (via pairedSurahs.targetLangData)
+    const targetMeaning = pairedSurahs.targetLangData?.surah_meaning || pairedSurahs.targetLangData?.arti_nama_surah;
+    if (targetMeaning) return targetMeaning;
+
+    // Strict policy: Jika tidak ada JSON-nya maka jangan diisi (berlaku untuk semua bahasa)
+    return '';
+  }, [appLanguage, pairedSurahs, folder, surahMeaning]);
+
   // Build card modal data for current active verse
   const cardModalData: AyatCardData = useMemo(() => {
     const vNum = cardModalVerseNum || selectedVerse || 1;
     const { arabicText, translationText, currentText } = getVersePair(vNum);
 
-    const localizedMeaning =
-      surahMeaning ||
-      pairedSurahs.targetLangData?.surah_meaning ||
-      pairedSurahs.targetLangData?.arti_nama_surah ||
-      (appLanguage.toLowerCase() === 'bahasa indonesia' ? pairedSurahs.indonesianData?.arti_nama_surah : pairedSurahs.englishData?.surah_meaning) ||
-      '';
-
     return {
       surahNumber: typeof surahNum === 'number' ? surahNum : parseInt(String(surahNum), 10) || 1,
       surahName: surahName || 'Surah',
-      surahMeaning: surahMeaning || '',
+      surahMeaning: appMeaning,
       revelationPlace: revPlace || '',
       totalVerses: verseCount || versesList.length,
       verseNumber: vNum,
@@ -319,7 +333,7 @@ export function QuranPreview({
       folder: folder,
       fileName: fileName,
     };
-  }, [cardModalVerseNum, selectedVerse, surahNum, surahName, surahMeaning, revPlace, verseCount, versesList, folder, fileName, pairedSurahs, appLanguage]);
+  }, [cardModalVerseNum, selectedVerse, surahNum, surahName, appMeaning, revPlace, verseCount, versesList, folder, fileName, pairedSurahs]);
 
   // List of all verses for prev/next in modal
   const allVersesList = useMemo(() => {
@@ -416,7 +430,10 @@ export function QuranPreview({
 
                 {/* Transliterated / Localized Surah Name */}
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900">
-                  {surahName || 'Surah'}
+                  <span>{surahName || 'Surah'}</span>
+                  {appMeaning && (
+                    <span className="ml-2 text-stone-900 font-bold">({appMeaning})</span>
+                  )}
                 </h2>
               </div>
             );

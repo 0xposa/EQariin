@@ -618,13 +618,43 @@ export default function App() {
 
   // Options for JSON File Dropdown
   const fileOptions: DropdownOption[] = useMemo(() => {
-    return surahList.map((surah) => ({
-      value: surah.fileName,
-      label: surah.fileName,
-      subLabel: surah.surahNumber !== 999 ? `#${surah.surahNumber}` : undefined,
-      icon: <FileJson className="w-4 h-4 text-amber-500 shrink-0" />,
-    }));
-  }, [surahList]);
+    return surahList.map((surah) => {
+      let meaning = '';
+      if (appLanguage && appLanguage.toLowerCase() !== 'arabic') {
+        if (selectedFolder && selectedFolder.toLowerCase() === appLanguage.toLowerCase()) {
+          meaning = surah.surahMeaning || '';
+        } else {
+          // Look up corresponding JSON in the target appLanguage folder if it exists
+          const targetLangFile = files.find((f) => {
+            if (f.folder.toLowerCase() !== appLanguage.toLowerCase()) return false;
+            return (
+              (surah.surahNumber !== 999 &&
+                (f.content.includes(`"surah_number": ${surah.surahNumber}`) ||
+                  f.content.includes(`"nomor_surah": ${surah.surahNumber}`))) ||
+              matchesSurahSlug(f.fileName, toSurahSlug(surah.surahName || surah.fileName))
+            );
+          });
+          if (targetLangFile) {
+            try {
+              const parsed = JSON.parse(targetLangFile.content);
+              meaning = parsed.surah_meaning || parsed.arti_nama_surah || '';
+            } catch {}
+          }
+        }
+      }
+
+      const subParts: string[] = [];
+      if (surah.surahNumber !== 999) subParts.push(`#${surah.surahNumber}`);
+      if (meaning) subParts.push(meaning);
+
+      return {
+        value: surah.fileName,
+        label: surah.fileName,
+        subLabel: subParts.length > 0 ? subParts.join(' • ') : undefined,
+        icon: <FileJson className="w-4 h-4 text-amber-500 shrink-0" />,
+      };
+    });
+  }, [surahList, appLanguage, selectedFolder, files]);
 
   const handleDownloadLanguages = () => {
     const zip = new JSZip();

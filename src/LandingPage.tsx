@@ -299,7 +299,7 @@ export default function LandingPage() {
           
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a 
-              href="https://wa.me/6282197362062?text=Hello%20Muslim%20Plus%20Team%2C%20I%20am%20interested%20in%20discussing%20investment%20%2F%20strategic%20partnership%20opportunities." 
+              href="https://wa.me/6282197362062" 
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2.5 bg-emerald-900 hover:bg-emerald-950 text-white px-8 py-4 rounded-full font-semibold text-sm transition-all shadow-lg shadow-emerald-950/20 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
