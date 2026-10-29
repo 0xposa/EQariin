@@ -468,7 +468,7 @@ export default function AyatCardModal({
                 <div className="relative z-10 pt-4 border-t border-current/10 flex items-center justify-between gap-3 text-[11px]">
                   <div className="flex items-center gap-2">
                     <div className={`px-2 py-0.5 rounded-md border font-mono font-bold text-[10px] tracking-wider ${themeStyles.footerBadge}`}>
-                      MUSLIM PLUS
+                      EQARIIN
                     </div>
                     <span className="opacity-70 font-mono text-[10px] hidden sm:inline">
                       Quran JSON Open Repository
@@ -477,7 +477,7 @@ export default function AyatCardModal({
 
                   <div className="flex items-center gap-1.5 opacity-80 font-mono text-[10px]">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    <span>muslimplus.ai.studio</span>
+                    <span>eqariin.ai.studio</span>
                   </div>
                 </div>
               )}

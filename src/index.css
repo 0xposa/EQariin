@@ -8,6 +8,11 @@ html, body, #root {
   overscroll-behavior: none;
 }
 
+html {
+  scroll-padding-top: 5.5rem;
+  scroll-behavior: smooth;
+}
+
 @keyframes float-crescent {
   0%, 100% {
     transform: translateY(0px) rotate(-12deg);

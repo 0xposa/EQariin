@@ -143,7 +143,7 @@ export default function LandingPage() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.1 }}
-        className="relative w-full max-w-7xl mx-auto px-6 pt-12 pb-24 md:pt-20 md:pb-32 flex flex-col items-center text-center"
+        className="relative w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 pt-24 sm:pt-28 md:pt-32 pb-20 md:pb-28 flex flex-col items-center text-center"
       >
         {/* Background Decorative Blur */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-2xl h-64 bg-emerald-100/50 blur-[100px] rounded-full pointer-events-none -z-10" />
@@ -152,19 +152,19 @@ export default function LandingPage() {
           variants={itemVariants}
           className="font-['Playfair_Display'] text-5xl md:text-7xl font-bold text-emerald-950 tracking-tight mb-6"
         >
-          Muslim Plus
+          EQariin
         </motion.h1>
         
         <motion.p 
           variants={itemVariants}
-          className="text-lg md:text-xl text-stone-600 max-w-2xl mb-3 leading-relaxed"
+          className="text-lg md:text-xl text-stone-600 max-w-3xl mb-3 leading-relaxed"
         >
           {t.heroDesc}
         </motion.p>
         
         <motion.p 
           variants={itemVariants}
-          className={`text-base md:text-lg text-emerald-800/90 font-medium italic max-w-2xl mb-14 leading-relaxed ${
+          className={`text-base md:text-lg text-emerald-800/90 font-medium italic max-w-3xl mb-14 leading-relaxed ${
             appLanguage === 'Arabic' ? 'font-[\'Amiri\'] text-xl md:text-2xl not-italic' : ''
           }`}
           dir={appLanguage === 'Arabic' ? 'rtl' : 'ltr'}
@@ -175,7 +175,7 @@ export default function LandingPage() {
         {/* Quran Verse Display */}
         <motion.div 
           variants={itemVariants}
-          className="w-full max-w-3xl bg-white border border-stone-200/60 shadow-xl shadow-stone-200/40 rounded-3xl p-8 md:p-12 mb-12 relative overflow-hidden"
+          className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl bg-white border border-stone-200/60 shadow-xl shadow-stone-200/40 rounded-3xl p-8 md:p-12 mb-12 relative overflow-hidden transition-all duration-200"
         >
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-700 via-emerald-600 to-amber-500" />
           
@@ -275,7 +275,7 @@ export default function LandingPage() {
       </motion.section>
 
       {/* Investor & Strategic Partnership Section */}
-      <section className="bg-gradient-to-b from-stone-50 via-white to-stone-50 py-24 px-6 border-y border-stone-200/70 relative overflow-hidden">
+      <section className="bg-gradient-to-b from-stone-50 via-white to-stone-50 py-20 md:py-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 border-y border-stone-200/70 relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-50/70 blur-[90px] rounded-full pointer-events-none -z-10" />
 
         <motion.div 
@@ -283,7 +283,7 @@ export default function LandingPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
-          className="w-full max-w-3xl mx-auto text-center"
+          className="w-full max-w-4xl mx-auto text-center"
         >
           <motion.div variants={itemVariants} className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-900 text-emerald-300 shadow-md shadow-emerald-950/15 mb-6 ring-4 ring-emerald-50">
             <TrendingUp className="w-7 h-7" />
@@ -293,7 +293,7 @@ export default function LandingPage() {
             {t.investorTitle}
           </motion.h2>
           
-          <motion.p variants={itemVariants} className="text-stone-600 text-base md:text-lg mb-10 leading-relaxed max-w-2xl mx-auto">
+          <motion.p variants={itemVariants} className="text-stone-600 text-base md:text-lg mb-10 leading-relaxed max-w-3xl mx-auto">
             {t.investorDesc}
           </motion.p>
           
@@ -313,7 +313,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-emerald-950 text-emerald-50 py-24 px-6 relative overflow-hidden">
+      <section className="bg-emerald-950 text-emerald-50 py-20 md:py-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-900/50 rounded-full blur-[120px] pointer-events-none translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-900/20 rounded-full blur-[100px] pointer-events-none -translate-x-1/2 translate-y-1/2" />
 
@@ -322,14 +322,14 @@ export default function LandingPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
-          className="w-full max-w-7xl mx-auto relative z-10"
+          className="w-full relative z-10"
         >
           <motion.div variants={itemVariants} className="text-center mb-16">
             <h2 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold mb-4">{t.coreFeatures}</h2>
             <div className="w-16 h-1 bg-amber-500 mx-auto rounded-full" />
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
             {FEATURES.map((feat, idx) => {
               const Icon = feat.icon;
               return (
@@ -359,7 +359,7 @@ export default function LandingPage() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.05 }}
-        className="py-24 px-6 w-full max-w-7xl mx-auto"
+        className="scroll-mt-24 py-20 md:py-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full"
       >
         <motion.div variants={itemVariants} className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
@@ -367,14 +367,14 @@ export default function LandingPage() {
             <span>{WORLD_LANGUAGES.length}+ Global Datasets</span>
           </div>
           <h2 className="font-['Playfair_Display'] text-3xl md:text-5xl font-bold text-emerald-950 mb-4">{t.langTitle}</h2>
-          <p className="text-stone-600 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">{t.langDesc}</p>
+          <p className="text-stone-600 max-w-3xl mx-auto text-base md:text-lg leading-relaxed">{t.langDesc}</p>
         </motion.div>
 
         {/* Filter & Search Bar */}
-        <motion.div variants={itemVariants} className="w-full max-w-4xl mx-auto mb-10 flex flex-col gap-4">
+        <motion.div variants={itemVariants} className="w-full mb-8 flex flex-col gap-4">
           
           {/* Top Row: Status Tabs & Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch justify-between">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch justify-between w-full">
             {/* Status Switcher Tabs */}
             <div className="flex items-center bg-stone-100 p-1 rounded-xl border border-stone-200 shadow-inner">
               <button
@@ -415,7 +415,7 @@ export default function LandingPage() {
             </div>
 
             {/* Search Input */}
-            <div className="relative flex-1 sm:max-w-xs">
+            <div className="relative flex-1 sm:max-w-xs md:max-w-sm">
               <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
@@ -437,7 +437,7 @@ export default function LandingPage() {
           </div>
 
           {/* Bottom Row: Region Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar w-full">
             {REGIONS.map((region) => (
               <button
                 key={region}
@@ -457,10 +457,10 @@ export default function LandingPage() {
 
         {/* World Languages Grid */}
         {filteredLanguages.length > 0 ? (
-          <div className="flex flex-col items-center">
+          <div className="w-full flex flex-col items-center">
             <motion.div 
               layout="position"
-              className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 max-w-6xl mx-auto"
+              className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4"
             >
               <AnimatePresence mode="popLayout" initial={false}>
                 {visibleLanguages.map((lang, index) => {
@@ -568,25 +568,25 @@ export default function LandingPage() {
       </motion.section>
 
       {/* Footer */}
-      <footer className="relative z-10 bg-white border-t border-stone-200 py-16 px-6">
+      <footer className="relative z-10 bg-white border-t border-stone-200 py-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
-          className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8"
+          className="w-full grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8"
         >
           
           {/* Brand & Copyright */}
           <motion.div variants={itemVariants} className="text-center md:text-left flex flex-col justify-center md:justify-start">
             <div className="font-['Playfair_Display'] text-2xl font-bold text-emerald-900 mb-4">
-              Muslim Plus.
+              EQariin.
             </div>
             <p className="text-sm text-stone-500 max-w-xs mx-auto md:mx-0 leading-relaxed">
               {t.footerDesc}
             </p>
             <p className="text-sm text-stone-400 mt-6">
-              © 2026 Muslim Plus Project.<br className="hidden md:block" /> All rights reserved.
+              © 2026 EQariin Project.<br className="hidden md:block" /> All rights reserved.
             </p>
           </motion.div>
 

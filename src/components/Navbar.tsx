@@ -27,12 +27,12 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 w-full bg-emerald-950/90 backdrop-blur-md text-emerald-50 z-50 border-b border-emerald-900/50 shadow-md">
-        <div className="w-full max-w-7xl mx-auto px-6 py-4 md:py-5 flex justify-between items-center">
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4 md:py-5 flex justify-between items-center">
           <div 
             onClick={() => navigate('/')}
             className="font-['Playfair_Display'] text-2xl font-bold tracking-tight cursor-pointer hover:opacity-90 transition-opacity"
           >
-            Muslim Plus<span className="text-emerald-400">.</span>
+            EQariin<span className="text-emerald-400">.</span>
           </div>
           <div className="flex items-center gap-6">
             {/* Language Dropdown */}

@@ -1,6 +1,6 @@
 {
-  "name": "E Qariin",
-  "description": "Muslim Plus - Multilingual Quran dataset repository and ecosystem.",
+  "name": "EQariin",
+  "description": "EQariin - Multilingual Quran dataset repository and ecosystem.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

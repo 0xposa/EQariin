@@ -57,3 +57,11 @@
 ## 7. Self-Documentation Requirement
 - After completing any task that changes the project's schema, architecture, naming conventions, or established rules (e.g. changing JSON field names, renaming the project, changing the translation source policy, modifying the slug system), the AI MUST update this file (AGENTS.md) in the same response to reflect the change.
 - Do NOT wait to be asked separately to update this file — updating it is part of completing the task itself.
+
+## 8. Layout & Responsive Viewport Standards
+- **Full-Width Edge-to-Edge Alignment**:
+  - The application layout must adapt fluidly across all viewport widths and zoom levels.
+  - Header (`Navbar`), main content sections (Hero, Investor, Features, World Languages), and Footer must use a uniform horizontal padding guide (`w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16`) so that left and right edges align consistently throughout the app.
+  - Avoid restricting top-level sections with arbitrary fixed `max-w` containers (e.g. `max-w-3xl`, `max-w-6xl`, `max-w-7xl` with `mx-auto`) that cause jagged alignment or wide dead spaces on wide/zoomed displays.
+- **Fixed Header Scroll Margin**:
+  - Because `Navbar` is fixed, `html` must maintain `scroll-padding-top` (at least `5.5rem`) and sections with anchors must include `scroll-mt` to prevent section headers from being obscured when scrolled to.

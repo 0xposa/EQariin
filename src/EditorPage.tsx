@@ -694,7 +694,7 @@ export default function App() {
 
       {/* Sub Topbar (Modern Breadcrumb Toolbar) */}
       <div className="w-full bg-white/95 backdrop-blur-md border-b border-stone-200/80 shadow-2xs z-30 shrink-0">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3">
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-2 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2.5 text-xs text-stone-600">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 select-none pl-0.5">
               {labels.languagesBreadcrumb}

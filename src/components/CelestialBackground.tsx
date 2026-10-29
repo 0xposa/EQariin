@@ -128,7 +128,7 @@ export default function CelestialBackground() {
     >
       {/* Crescent Moon (Top-Right Angle) */}
       <div 
-        className="absolute top-6 right-2 sm:top-10 sm:right-8 md:top-14 md:right-16 lg:right-24 xl:right-32 text-amber-500 opacity-[0.14] animate-float-crescent"
+        className="absolute top-20 right-4 sm:top-24 sm:right-8 md:top-24 md:right-12 lg:right-16 xl:right-20 text-amber-500 opacity-[0.14] animate-float-crescent pointer-events-none"
         style={{ willChange: 'transform' }}
       >
         <svg 
